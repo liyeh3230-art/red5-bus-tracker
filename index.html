@@ -10,55 +10,50 @@
         body { font-family: 'Inter', 'Noto Sans TC', sans-serif; }
         .scroll-hide::-webkit-scrollbar { display: none; }
         .scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
-        .animate-pulse-slow { animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+        
+        /* Timeline Styles */
+        .timeline-line { position: absolute; left: 19px; top: 24px; bottom: -10px; width: 2px; background: #e2e8f0; z-index: 0; }
+        .timeline-item:last-child .timeline-line { display: none; }
+        
+        /* Bus Badge Animation */
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+        .bus-float { animation: float 2s ease-in-out infinite; }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-800 h-screen flex overflow-hidden">
+<body class="bg-slate-50 text-slate-800 h-screen flex overflow-hidden">
 
-    <!-- Left Sidebar: All Buses -->
-    <aside class="w-80 bg-slate-900 text-white flex flex-col shrink-0 z-20 shadow-xl border-r border-slate-800">
+    <!-- Left Sidebar: Route Timeline -->
+    <aside class="w-80 bg-white flex flex-col shrink-0 z-20 shadow-xl border-r border-slate-200">
         <!-- Header -->
-        <div class="p-5 border-b border-slate-800 bg-slate-950">
-            <div class="flex items-center gap-3 mb-1">
+        <div class="p-4 border-b border-slate-200 bg-slate-50">
+            <div class="flex items-center gap-3 mb-2">
                 <span class="bg-red-600 text-white font-bold px-2 py-0.5 rounded text-sm tracking-wider">紅5</span>
-                <h1 class="font-bold text-lg">全線即時動態</h1>
+                <h1 class="font-bold text-slate-800">路線動態</h1>
             </div>
-            <div class="text-xs text-slate-500 flex items-center gap-2">
-                <span id="connection-status" class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                <span id="last-update-time">連線中...</span>
-            </div>
-        </div>
-
-        <!-- Bus List -->
-        <div class="flex-1 overflow-y-auto p-2 scroll-hide" id="all-bus-container">
             
-            <!-- Sidebar Downhill Section -->
-            <div class="sticky top-0 bg-slate-950/90 backdrop-blur z-10 px-2 py-1.5 mb-2 border-b border-slate-800 flex justify-between items-center">
-                <span class="text-xs font-bold text-blue-400">📉 下山 (往劍潭)</span>
-                <span class="text-[10px] bg-slate-800 px-1.5 rounded text-slate-400" id="sidebar-down-count">0</span>
-            </div>
-            <div id="sidebar-down-list" class="space-y-2 mb-6">
-                <!-- Dynamic Content -->
-            </div>
-
-            <!-- Sidebar Uphill Section -->
-            <div class="sticky top-0 bg-slate-950/90 backdrop-blur z-10 px-2 py-1.5 mb-2 border-b border-slate-800 flex justify-between items-center">
-                <span class="text-xs font-bold text-orange-400">📈 上山 (往文大)</span>
-                <span class="text-[10px] bg-slate-800 px-1.5 rounded text-slate-400" id="sidebar-up-count">0</span>
-            </div>
-            <div id="sidebar-up-list" class="space-y-2">
-                <!-- Dynamic Content -->
-            </div>
-
-            <div id="sidebar-loading" class="text-center text-slate-600 text-xs py-10">
-                正在搜尋車輛訊號...
+            <!-- Direction Tabs -->
+            <div class="flex p-1 bg-slate-200 rounded-lg">
+                <button onclick="switchSidebar('down')" id="tab-down" class="flex-1 py-1.5 text-xs font-bold rounded-md transition-all bg-white text-blue-600 shadow-sm">
+                    📉 下山 (往劍潭)
+                </button>
+                <button onclick="switchSidebar('up')" id="tab-up" class="flex-1 py-1.5 text-xs font-bold rounded-md transition-all text-slate-500 hover:text-slate-700">
+                    📈 上山 (往文大)
+                </button>
             </div>
         </div>
 
-        <!-- Footer -->
-        <div class="p-3 border-t border-slate-800 bg-slate-950 text-[10px] text-slate-600 text-center">
-            資料來源: 臺北市公共運輸處
+        <!-- Timeline List -->
+        <div class="flex-1 overflow-y-auto p-0 relative scroll-hide" id="sidebar-container">
+            <!-- Dynamic Content -->
+            <div class="p-10 text-center text-slate-400 text-xs">載入路線資料中...</div>
+        </div>
+
+        <!-- Footer Status -->
+        <div class="p-2 border-t border-slate-200 bg-slate-50 text-[10px] text-slate-500 flex justify-between items-center">
+            <span id="last-update-time">連線中...</span>
+            <span id="connection-status" class="flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full bg-emerald-500"></span> 連線正常
+            </span>
         </div>
     </aside>
 
@@ -70,39 +65,39 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
                 <!-- Card: Downhill -->
-                <div class="bg-gradient-to-br from-blue-50 to-white border border-blue-100 rounded-xl p-5 relative overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                    <div class="absolute top-0 right-0 bg-blue-100 text-blue-600 text-[10px] font-bold px-2 py-1 rounded-bl-lg">下山</div>
-                    <div class="flex justify-between items-end">
+                <div class="bg-gradient-to-br from-blue-50 to-white border border-blue-100 rounded-xl p-5 relative overflow-hidden shadow-sm hover:shadow-md transition-shadow group">
+                    <div class="absolute top-0 right-0 bg-blue-100 text-blue-600 text-[10px] font-bold px-3 py-1 rounded-bl-lg">下山</div>
+                    <div class="flex justify-between items-end relative z-10">
                         <div>
-                            <div class="text-slate-500 text-xs font-bold tracking-wider uppercase mb-1">文化大學 ➔ 劍潭站</div>
+                            <div class="text-slate-500 text-xs font-bold tracking-wider uppercase mb-1">文大 ➔ 劍潭站</div>
                             <div class="flex items-baseline gap-1">
                                 <span class="text-4xl font-black text-blue-600 tracking-tight" id="down-avg">--</span>
                                 <span class="text-sm text-blue-400 font-bold">分</span>
                             </div>
-                            <div class="text-[10px] text-slate-400 mt-1">平均行駛時間</div>
+                            <div class="text-[10px] text-slate-400 mt-1 group-hover:text-blue-400 transition-colors">平均行駛時間</div>
                         </div>
                         <div class="text-right">
                             <div class="text-2xl font-bold text-slate-700" id="down-count">0</div>
-                            <div class="text-[10px] text-slate-400">行駛中</div>
+                            <div class="text-[10px] text-slate-400">行駛中車輛</div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Card: Uphill -->
-                <div class="bg-gradient-to-br from-orange-50 to-white border border-orange-100 rounded-xl p-5 relative overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                    <div class="absolute top-0 right-0 bg-orange-100 text-orange-600 text-[10px] font-bold px-2 py-1 rounded-bl-lg">上山</div>
-                    <div class="flex justify-between items-end">
+                <div class="bg-gradient-to-br from-orange-50 to-white border border-orange-100 rounded-xl p-5 relative overflow-hidden shadow-sm hover:shadow-md transition-shadow group">
+                    <div class="absolute top-0 right-0 bg-orange-100 text-orange-600 text-[10px] font-bold px-3 py-1 rounded-bl-lg">上山</div>
+                    <div class="flex justify-between items-end relative z-10">
                         <div>
-                            <div class="text-slate-500 text-xs font-bold tracking-wider uppercase mb-1">劍潭站 ➔ 文化大學</div>
+                            <div class="text-slate-500 text-xs font-bold tracking-wider uppercase mb-1">劍潭站 ➔ 文大</div>
                             <div class="flex items-baseline gap-1">
                                 <span class="text-4xl font-black text-orange-600 tracking-tight" id="up-avg">--</span>
                                 <span class="text-sm text-orange-400 font-bold">分</span>
                             </div>
-                            <div class="text-[10px] text-slate-400 mt-1">平均行駛時間</div>
+                            <div class="text-[10px] text-slate-400 mt-1 group-hover:text-orange-400 transition-colors">平均行駛時間</div>
                         </div>
                         <div class="text-right">
                             <div class="text-2xl font-bold text-slate-700" id="up-count">0</div>
-                            <div class="text-[10px] text-slate-400">行駛中</div>
+                            <div class="text-[10px] text-slate-400">行駛中車輛</div>
                         </div>
                     </div>
                 </div>
@@ -113,22 +108,20 @@
         <!-- Content Split -->
         <div class="flex-1 grid grid-cols-1 md:grid-cols-2 overflow-hidden bg-slate-50">
             
-            <!-- Downhill List -->
-            <section class="border-r border-slate-200 flex flex-col h-full">
-                <div class="px-4 py-2 bg-slate-100 border-b border-slate-200 text-xs font-bold text-slate-500 flex justify-between sticky top-0">
-                    <span>📉 下山監測中</span>
-                    <span class="bg-blue-100 text-blue-600 px-1.5 rounded" id="down-status-badge">0 車輛</span>
+            <!-- Downhill Tracking List -->
+            <section class="border-r border-slate-200 flex flex-col h-full relative">
+                <div class="px-4 py-3 bg-slate-100/80 backdrop-blur border-b border-slate-200 text-xs font-bold text-slate-500 flex justify-between sticky top-0 z-10">
+                    <span class="flex items-center gap-1">📉 下山監測 <span class="text-[10px] font-normal text-slate-400">(文化大學出發)</span></span>
                 </div>
                 <div class="flex-1 overflow-y-auto p-4 space-y-3 scroll-hide" id="down-list">
                     <!-- Dynamic -->
                 </div>
             </section>
 
-            <!-- Uphill List -->
-            <section class="flex flex-col h-full">
-                <div class="px-4 py-2 bg-slate-100 border-b border-slate-200 text-xs font-bold text-slate-500 flex justify-between sticky top-0">
-                    <span>📈 上山監測中</span>
-                    <span class="bg-orange-100 text-orange-600 px-1.5 rounded" id="up-status-badge">0 車輛</span>
+            <!-- Uphill Tracking List -->
+            <section class="flex flex-col h-full relative">
+                <div class="px-4 py-3 bg-slate-100/80 backdrop-blur border-b border-slate-200 text-xs font-bold text-slate-500 flex justify-between sticky top-0 z-10">
+                    <span class="flex items-center gap-1">📈 上山監測 <span class="text-[10px] font-normal text-slate-400">(捷運劍潭站出發)</span></span>
                 </div>
                 <div class="flex-1 overflow-y-auto p-4 space-y-3 scroll-hide" id="up-list">
                     <!-- Dynamic -->
@@ -138,9 +131,9 @@
         </div>
         
         <!-- Footer Tools -->
-        <div class="bg-white border-t border-slate-200 p-2 px-4 flex justify-between items-center shrink-0 text-xs">
-            <button id="reset-btn" class="text-slate-400 hover:text-red-500">清除資料</button>
-            <button id="export-btn" class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded transition-colors">
+        <div class="bg-white border-t border-slate-200 p-2 px-4 flex justify-between items-center shrink-0 text-xs z-20">
+            <button id="reset-btn" class="text-slate-400 hover:text-red-500 transition-colors">清除紀錄</button>
+            <button id="export-btn" class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded transition-colors shadow-sm">
                 📥 下載 CSV 報表
             </button>
         </div>
@@ -151,136 +144,72 @@
     <script>
         // --- Config ---
         const CONFIG = {
-            // 0,1 = Downhill | 2,3 = Uphill
             API_URLS: [
-                'https://pda5284.gov.taipei/MQS/SubRouteDyna?csvsubrouteid=158420', // 下山
-                'https://pda5284.gov.taipei/MQS/SubRouteDyna?csvsubrouteid=157609', // 下山
-                'https://pda5284.gov.taipei/MQS/SubRouteDyna?csvsubrouteid=158419', // 上山
-                'https://pda5284.gov.taipei/MQS/SubRouteDyna?csvsubrouteid=157610'  // 上山
+                'https://pda5284.gov.taipei/MQS/SubRouteDyna?csvsubrouteid=158420', // 下山 1
+                'https://pda5284.gov.taipei/MQS/SubRouteDyna?csvsubrouteid=157609', // 下山 2
+                'https://pda5284.gov.taipei/MQS/SubRouteDyna?csvsubrouteid=158419', // 上山 1
+                'https://pda5284.gov.taipei/MQS/SubRouteDyna?csvsubrouteid=157610'  // 上山 2
             ],
             PROXIES: [
+                'https://corsproxy.io/?',  // 通常最快，優先使用
                 'https://api.allorigins.win/raw?url=',
-                'https://corsproxy.io/?',
                 'https://cors-anywhere.herokuapp.com/'
             ],
-            REFRESH_MS: 5000,
+            REFRESH_MS: 3000, // 提升至 3秒 更新一次
             STOPS: {
-                // 下山 (文大 -> 劍潭)
-                DOWN_START: '11073',
-                DOWN_END: '11121',
-                // 上山 (劍潭 -> 文大)
-                UP_START: '11123', 
-                UP_END: '11169'
+                DOWN_START: '11073', // 文化大學
+                DOWN_END: '11121',   // 捷運劍潭站
+                UP_START: '11123',   // 捷運劍潭站(北藝中心)
+                UP_END: '11169'      // 文化大學
             }
         };
 
-        // 擴充站點對照表以顯示中文
         const STOP_NAMES = {
-            // === 📉 下山 (往劍潭) ===
-            '174781': '陽明山總站',
-            '11053': '陽明山',
-            '125818': '中山樓',
-            '11057': '教師中心',
-            '11059': '聯勤陽明山招待所',
-            '11061': '福壽橋',
-            '11063': '格致大亨路口',
-            '11065': '磺溪底',
-            '58228': '文化大學一',
-            '11071': '陽明天主堂',
-            '11073': '文化大學',
-            '11075': '山仔后派出所',
-            '11077': '格致國中',
-            '11079': '下竹林',
-            '11081': '新安',
-            '11083': '白雲山莊',
-            '11085': '明德新村',
-            '11087': '陽明山國小',
-            '11089': '福音',
-            '11091': '陽明教養院',
-            '11093': '永福(林語堂故居)',
-            '11095': '永嶺',
-            '11097': '拔子埔',
-            '11099': '嶺頭',
-            '11101': '華興中學',
-            '11103': '芝蘭新村',
-            '11105': '岩山里一',
-            '11107': '岩山里',
-            '11109': '泰北中學',
-            '11111': '士林官邸(中正)',
-            '11113': '福林國小',
-            '11115': '捷運士林站',
-            '11117': '台電台北北區營業處',
-            '11119': '銘傳大學',
-            '11121': '捷運劍潭站',
-
-            // === 📈 上山 (往文大/陽明山) ===
-            '11123': '捷運劍潭站(北藝中心)',
-            '11125': '小北街',
-            '11051': '士林區農會',
-            '11127': '捷運士林站(中正)',
-            '11129': '福林國小',
-            '11131': '士林官邸(中正)',
-            '11133': '泰北中學',
-            '11135': '岩山里',
-            '11137': '岩山里一',
-            '11139': '芝蘭新村',
-            '11141': '華興中學',
-            '11143': '嶺頭',
-            '11145': '拔子埔',
-            '11147': '永嶺',
-            '11149': '永福(林語堂故居)',
-            '11151': '陽明教養院',
-            '11153': '福音',
-            '11155': '陽明山國小',
-            '11157': '明德新村',
-            '11159': '白雲山莊',
-            '11161': '新安',
-            '11163': '下竹林',
-            '11165': '格致國中',
-            '11167': '山仔后派出所',
-            '11169': '文化大學',
-            '11173': '文化大學一',
-            '11175': '陽明天主堂',
-            '11177': '磺溪底',
-            '11179': '格致大亨路口',
-            '11181': '福壽橋',
-            '11183': '聯勤陽明山招待所',
-            '11055': '錫安堂',
-            '11185': '教師中心',
-            '125817': '中山樓',
-            '57747': '陽明山',
-            '11187': '陽明山總站'
+            // 下山
+            '174781': '陽明山總站', '11053': '陽明山', '125818': '中山樓', '11057': '教師中心',
+            '11059': '聯勤陽明山招待所', '11061': '福壽橋', '11063': '格致大亨路口', '11065': '磺溪底',
+            '58228': '文化大學一', '11071': '陽明天主堂', '11073': '文化大學', '11075': '山仔后派出所',
+            '11077': '格致國中', '11079': '下竹林', '11081': '新安', '11083': '白雲山莊',
+            '11085': '明德新村', '11087': '陽明山國小', '11089': '福音', '11091': '陽明教養院',
+            '11093': '永福(林語堂故居)', '11095': '永嶺', '11097': '拔子埔', '11099': '嶺頭',
+            '11101': '華興中學', '11103': '芝蘭新村', '11105': '岩山里一', '11107': '岩山里',
+            '11109': '泰北中學', '11111': '士林官邸(中正)', '11113': '福林國小', '11115': '捷運士林站',
+            '11117': '台電台北北區營業處', '11119': '銘傳大學', '11121': '捷運劍潭站',
+            // 上山 (補齊)
+            '11123': '捷運劍潭站(北藝中心)', '11125': '小北街', '11051': '士林區農會', '11127': '捷運士林站(中正)',
+            '11129': '福林國小', '11131': '士林官邸(中正)', '11133': '泰北中學', '11135': '岩山里',
+            '11137': '岩山里一', '11139': '芝蘭新村', '11141': '華興中學', '11143': '嶺頭',
+            '11145': '拔子埔', '11147': '永嶺', '11149': '永福(林語堂故居)', '11151': '陽明教養院',
+            '11153': '福音', '11155': '陽明山國小', '11157': '明德新村', '11159': '白雲山莊',
+            '11161': '新安', '11163': '下竹林', '11165': '格致國中', '11167': '山仔后派出所',
+            '11169': '文化大學', '11173': '文化大學一', '11175': '陽明天主堂', '11177': '磺溪底',
+            '11179': '格致大亨路口', '11181': '福壽橋', '11183': '聯勤陽明山招待所', '11055': '錫安堂',
+            '11185': '教師中心', '125817': '中山樓', '57747': '陽明山', '11187': '陽明山總站'
         };
 
         // --- State ---
         let state = {
-            // { plate: { type:'down'|'up', startTime, startStop, lastUpdate, currentStop, stopId } }
-            tracking: {},
-            // [{ type, plate, startTime, endTime, duration, date }]
+            tracking: {}, // { plate: { type, startTime, isWaiting, ... } }
             completed: [],
             proxyIndex: 0,
-            allBuses: [] // List of all raw bus data for sidebar
+            allBuses: [], // List of all active buses
+            routeStops: { down: [], up: [] }, // Ordered stop lists for timeline
+            activeSidebar: 'down' // 'down' or 'up'
         };
 
         // --- DOM ---
         const els = {
-            sidebarDownList: document.getElementById('sidebar-down-list'),
-            sidebarUpList: document.getElementById('sidebar-up-list'),
-            sidebarDownCount: document.getElementById('sidebar-down-count'),
-            sidebarUpCount: document.getElementById('sidebar-up-count'),
-            sidebarLoading: document.getElementById('sidebar-loading'),
+            sidebarContainer: document.getElementById('sidebar-container'),
             downList: document.getElementById('down-list'),
             upList: document.getElementById('up-list'),
             downAvg: document.getElementById('down-avg'),
             upAvg: document.getElementById('up-avg'),
             downCount: document.getElementById('down-count'),
             upCount: document.getElementById('up-count'),
-            downBadge: document.getElementById('down-status-badge'),
-            upBadge: document.getElementById('up-status-badge'),
-            statusDot: document.getElementById('connection-status'),
+            statusDot: document.getElementById('connection-status').querySelector('span'),
             statusText: document.getElementById('last-update-time'),
-            exportBtn: document.getElementById('export-btn'),
-            resetBtn: document.getElementById('reset-btn')
+            tabDown: document.getElementById('tab-down'),
+            tabUp: document.getElementById('tab-up')
         };
 
         // --- Init ---
@@ -288,51 +217,47 @@
             loadData();
             fetchData();
             setInterval(fetchData, CONFIG.REFRESH_MS);
-
-            els.resetBtn.addEventListener('click', () => {
-                if(confirm('確定清除所有記錄？')) {
-                    state.tracking = {};
-                    state.completed = [];
-                    saveData();
-                    render();
-                }
+            document.getElementById('reset-btn').addEventListener('click', () => {
+                if(confirm('確定清除所有記錄？')) { state.tracking = {}; state.completed = []; saveData(); render(); }
             });
-            els.exportBtn.addEventListener('click', exportCSV);
+            document.getElementById('export-btn').addEventListener('click', exportCSV);
         }
 
-        // --- Core Logic ---
+        // --- Fetch & Parse ---
         async function fetchData() {
             updateStatus('loading');
-            
-            const busMap = new Map();
             const proxy = CONFIG.PROXIES[state.proxyIndex];
+            const busMap = new Map();
+            let fetchedStops = { down: null, up: null };
 
             try {
-                // Fetch all URLs parallel
                 const promises = CONFIG.API_URLS.map(url => 
-                    fetch(proxy + encodeURIComponent(url))
-                        .then(r => r.ok ? r.json() : null)
-                        .catch(e => null)
+                    fetch(proxy + encodeURIComponent(url)).then(r => r.ok ? r.json() : null).catch(e => null)
                 );
-
                 const results = await Promise.all(promises);
-                
-                let success = false;
+
                 results.forEach((data, index) => {
                     if (data) {
-                        // 0,1 = Down | 2,3 = Up
+                        if(data.contents) try{ data = JSON.parse(data.contents); }catch(e){}
+                        if (!data.SubRoute) return;
+
                         const dir = index < 2 ? 'down' : 'up';
+                        
+                        // Capture Stops (Only need once per direction)
+                        if (!fetchedStops[dir] && data.SubRoute[0]?.TTE?.stops) {
+                            fetchedStops[dir] = data.SubRoute[0].TTE.stops;
+                        }
+
+                        // Capture Buses
                         parseBusData(data, busMap, dir);
-                        success = true;
                     }
                 });
 
-                if (!success) throw new Error("All sources failed");
-
-                // Update State
+                if (fetchedStops.down) state.routeStops.down = fetchedStops.down;
+                if (fetchedStops.up) state.routeStops.up = fetchedStops.up;
+                
                 state.allBuses = Array.from(busMap.values());
                 updateTracking(state.allBuses);
-                
                 updateStatus('ok');
                 render();
 
@@ -344,105 +269,109 @@
         }
 
         function parseBusData(data, busMap, direction) {
-            if (data.contents) {
-                try { data = JSON.parse(data.contents); } catch(e){}
-            }
-            if (!data.SubRoute) return;
+            // 計算 20 分鐘前的時間戳，用於過濾舊資料
+            const okDataMS = Date.now() - 1200000; 
 
             data.SubRoute.forEach(sub => {
                 if (!sub.Bus) return;
                 sub.Bus.forEach(bus => {
+                    // 1. 基礎資料檢查
                     if (!bus.a2) return;
-                    // a2 format: ... StopId is index 7
-                    const parts = bus.a2.split(',');
-                    if (parts.length > 8) {
-                        const stopId = parts[7];
-                        let busTime = Date.now();
-                        
-                        // Try parse time
-                        if (parts.length > 11 && parts[11].length >= 12) {
-                             const t = parts[11]; // YYMMDDHHmmss
-                             busTime = new Date(`20${t.substr(0,2)}-${t.substr(2,2)}-${t.substr(4,2)}T${t.substr(6,2)}:${t.substr(8,2)}:${t.substr(10,2)}`).getTime();
-                        }
+                    
+                    // 2. 過濾測試車輛 (Regex: /^TEST.*$/g)
+                    if (/^TEST.*$/g.test(bus.num)) return;
 
-                        // Add to Map (deduplicate by Plate, prefer newer data)
-                        const existing = busMap.get(bus.num);
-                        if (!existing || busTime > existing.time) {
-                            busMap.set(bus.num, {
-                                plate: bus.num,
-                                stopId: stopId,
-                                stopName: STOP_NAMES[stopId] || `站點 ${stopId}`,
-                                time: busTime,
-                                subRoute: sub.subRouteId,
-                                direction: direction
-                            });
-                        }
+                    // 3. 解析 a1 與過濾 (參考官方邏輯)
+                    if (bus.a1) {
+                        const arrA1 = bus.a1.split(',');
+                        // arrA1[3]=="2" (Provider?) || arrA1[4]=="99" (Status?)
+                        if (arrA1[3] === "2" || arrA1[4] === "99") return;
                     }
+
+                    // 4. 解析 a2 與過濾 (參考官方邏輯)
+                    const arrA2 = bus.a2.split(',');
+                    if (arrA2.length <= 11) return; // 確保資料長度足夠
+                    if (arrA2[3] === "2" || arrA2[4] === "99") return;
+
+                    // 5. 時間過濾 (okDataMS)
+                    // 解析時間字串: YYMMDDHHmmss (index 11)
+                    const timeStr = arrA2[11];
+                    if (timeStr && timeStr.length >= 12) {
+                         const busTime = Date.parse("20"+timeStr.substr(0,2)+"-"+timeStr.substr(2,2)+"-"+timeStr.substr(4,2)+"T"+timeStr.substr(6,2)+":"+timeStr.substr(8,2)+":"+timeStr.substr(10,2));
+                         if (busTime < okDataMS) return; // 資料過舊
+                    }
+
+                    // 6. 首站過濾邏輯
+                    // if (arrA2[8]=="1" && PathAttrFirstStopIdMap... && busStopId==...)
+                    const busStopId = arrA2[7];
+                    const subRouteId = arrA2[5]; // a2[5] 是 subRouteId
+                    if (arrA2[8] === "1" && FIRST_STOP_MAP[subRouteId] && busStopId == FIRST_STOP_MAP[subRouteId]) {
+                        // 官方邏輯：如果車輛狀態為 1 (可能為進站/等待) 且在該路線定義的起始站，則過濾
+                        return;
+                    }
+
+                    // 通過所有檢查，加入清單
+                    busMap.set(bus.num, {
+                        plate: bus.num,
+                        stopId: busStopId,
+                        stopName: STOP_NAMES[busStopId] || `站點 ${busStopId}`,
+                        time: Date.now(),
+                        direction: direction,
+                        a2: bus.a2,
+                        type: bus.type // 用於判斷圖示顏色等
+                    });
                 });
             });
         }
 
+        // --- Tracking Logic (Smart Start) ---
         function updateTracking(currentBuses) {
             const now = Date.now();
+            const seenPlates = new Set();
 
             currentBuses.forEach(bus => {
                 const plate = bus.plate;
+                seenPlates.add(plate);
                 const stopId = bus.stopId;
-                
+
                 // 1. Downhill Start
                 if (stopId === CONFIG.STOPS.DOWN_START) {
                     if (!state.tracking[plate] || state.tracking[plate].type !== 'down') {
-                        state.tracking[plate] = {
-                            type: 'down',
-                            startTime: bus.time,
-                            startStop: '文化大學',
-                            lastUpdate: now,
-                            currentStop: bus.stopName
-                        };
+                        state.tracking[plate] = { type: 'down', startTime: now, startStop: '文化大學', lastUpdate: now, currentStop: bus.stopName, isWaiting: true };
                     } else {
+                        state.tracking[plate].startTime = now; // Reset time while waiting
+                        state.tracking[plate].isWaiting = true;
                         state.tracking[plate].lastUpdate = now;
-                        state.tracking[plate].currentStop = bus.stopName;
                     }
                 }
                 // 2. Uphill Start
                 else if (stopId === CONFIG.STOPS.UP_START) {
                     if (!state.tracking[plate] || state.tracking[plate].type !== 'up') {
-                        state.tracking[plate] = {
-                            type: 'up',
-                            startTime: bus.time,
-                            startStop: '捷運劍潭站',
-                            lastUpdate: now,
-                            currentStop: bus.stopName
-                        };
+                        state.tracking[plate] = { type: 'up', startTime: now, startStop: '捷運劍潭站', lastUpdate: now, currentStop: bus.stopName, isWaiting: true };
                     } else {
-                         state.tracking[plate].lastUpdate = now;
-                         state.tracking[plate].currentStop = bus.stopName;
+                        state.tracking[plate].startTime = now; // Reset time while waiting
+                        state.tracking[plate].isWaiting = true;
+                        state.tracking[plate].lastUpdate = now;
                     }
                 }
-                
-                // 3. Update Active Trips
-                if (state.tracking[plate]) {
+                // 3. En Route
+                else if (state.tracking[plate]) {
                     const trip = state.tracking[plate];
+                    trip.isWaiting = false; // Started!
                     trip.lastUpdate = now;
                     trip.currentStop = bus.stopName;
                     trip.stopId = stopId;
 
-                    // Finish Downhill
-                    if (trip.type === 'down' && stopId === CONFIG.STOPS.DOWN_END) {
-                        completeTrip(plate, trip, bus.time);
-                    }
-                    // Finish Uphill
-                    else if (trip.type === 'up' && stopId === CONFIG.STOPS.UP_END) {
-                        completeTrip(plate, trip, bus.time);
+                    if ((trip.type === 'down' && stopId === CONFIG.STOPS.DOWN_END) || 
+                        (trip.type === 'up' && stopId === CONFIG.STOPS.UP_END)) {
+                        completeTrip(plate, trip, now);
                     }
                 }
             });
 
-            // Cleanup Stale
+            // Cleanup Stale (> 20 mins)
             for (let plate in state.tracking) {
-                if (now - state.tracking[plate].lastUpdate > 1200000) { // 20 mins no signal
-                    delete state.tracking[plate];
-                }
+                if (now - state.tracking[plate].lastUpdate > 1200000) delete state.tracking[plate];
             }
             saveData();
         }
@@ -465,92 +394,174 @@
 
         // --- Render ---
         function render() {
-            // 1. Left Sidebar (All Buses)
-            els.sidebarDownList.innerHTML = '';
-            els.sidebarUpList.innerHTML = '';
-            els.sidebarLoading.style.display = state.allBuses.length > 0 ? 'none' : 'block';
+            renderSidebar();
+            renderDashboard();
+            renderTrackingLists();
+        }
 
-            const allDown = state.allBuses.filter(b => b.direction === 'down').sort((a,b) => b.time - a.time);
-            const allUp = state.allBuses.filter(b => b.direction === 'up').sort((a,b) => b.time - a.time);
+        function switchSidebar(dir) {
+            state.activeSidebar = dir;
+            if (dir === 'down') {
+                els.tabDown.className = "flex-1 py-1.5 text-xs font-bold rounded-md transition-all bg-white text-blue-600 shadow-sm";
+                els.tabUp.className = "flex-1 py-1.5 text-xs font-bold rounded-md transition-all text-slate-500 hover:text-slate-700";
+            } else {
+                els.tabDown.className = "flex-1 py-1.5 text-xs font-bold rounded-md transition-all text-slate-500 hover:text-slate-700";
+                els.tabUp.className = "flex-1 py-1.5 text-xs font-bold rounded-md transition-all bg-white text-orange-600 shadow-sm";
+            }
+            renderSidebar();
+        }
 
-            els.sidebarDownCount.textContent = allDown.length;
-            els.sidebarUpCount.textContent = allUp.length;
+        function renderSidebar() {
+            const stops = state.routeStops[state.activeSidebar];
+            const buses = state.allBuses.filter(b => b.direction === state.activeSidebar);
+            
+            if (!stops || stops.length === 0) {
+                els.sidebarContainer.innerHTML = `<div class="p-10 text-center text-slate-400 text-xs">載入中或無資料...</div>`;
+                return;
+            }
 
-            const createSidebarItem = (bus, isDown) => {
-                const isTracking = state.tracking[bus.plate];
-                const baseColor = isDown ? 'blue' : 'orange';
-                const statusColor = isTracking ? `text-${baseColor}-400` : 'text-slate-500';
-                const statusText = isTracking ? '⏱️ 計時中' : '行駛中';
-                const borderColor = isTracking ? `border-${baseColor}-900` : 'border-slate-800';
+            // 使用 HTML String 批次構建，大幅減少 DOM 操作次數
+            const html = stops.map((stop, index) => {
+                const stopName = STOP_NAMES[stop.stopId] || `站點 ${stop.stopId}`;
+                const stopTTE = stop.stopTTE;
                 
-                const div = document.createElement('div');
-                div.className = `bg-slate-800/50 p-3 rounded border ${borderColor} flex justify-between items-center hover:bg-slate-800 transition-colors group`;
-                div.innerHTML = `
-                    <div>
-                        <div class="font-mono font-bold text-slate-200 flex items-center gap-2">
-                            ${bus.plate}
-                            ${isTracking ? `<span class="w-1.5 h-1.5 rounded-full bg-${baseColor}-500 animate-pulse"></span>` : ''}
+                const busHere = buses.find(b => {
+                    if (!b.a2) return false;
+                    // a2[7] is NextStopId
+                    return b.a2.split(',')[7] == stop.stopId;
+                });
+
+                let dotClass = 'bg-white border-slate-300';
+                let textClass = 'text-slate-800';
+                let statusText = '';
+                let statusColor = 'text-slate-400';
+                let opacity = 'opacity-100';
+                let removeOpacity = false;
+
+                const sStopTTE = stopTTE.toString();
+                if (TTE_MAP.hasOwnProperty(sStopTTE)) {
+                    statusText = TTE_MAP[sStopTTE];
+                    if (sStopTTE === '-2' || sStopTTE === '0') { 
+                        statusColor = 'text-red-500 font-bold';
+                        dotClass = 'bg-red-500 border-red-500 animate-pulse ring-4 ring-red-100';
+                        textClass = 'text-red-600 font-bold';
+                    } else if (sStopTTE === '-4') {
+                        statusText = '已過站';
+                        opacity = 'opacity-40';
+                        dotClass = 'bg-slate-200 border-slate-200';
+                    } else {
+                        opacity = 'opacity-60';
+                        dotClass = 'bg-slate-100 border-slate-300';
+                    }
+                } else {
+                    if (stopTTE > 0 && stopTTE < 180) {
+                        statusText = '將到站';
+                        statusColor = 'text-orange-500 font-bold';
+                        dotClass = 'bg-white border-orange-500';
+                    } else if (stopTTE >= 180) {
+                        const min = Math.floor(stopTTE / 60);
+                        statusText = `${min} 分`;
+                        statusColor = 'text-blue-600 font-bold';
+                        dotClass = 'bg-white border-blue-500';
+                    } else {
+                        statusText = '等待中';
+                        opacity = 'opacity-40';
+                    }
+                }
+
+                if (stop.departureTime && (stopTTE === -1 || stopTTE > 5940)) {
+                    statusText = `${stop.departureTime} 發車`;
+                    statusColor = 'text-slate-500 font-mono';
+                    dotClass = 'bg-slate-100 border-slate-300';
+                    opacity = 'opacity-75';
+                }
+
+                let busHtml = '';
+                if (busHere) {
+                    busHtml = `
+                        <div class="absolute -top-3 left-3 z-20 bus-float pointer-events-none">
+                            <div class="bg-yellow-400 text-slate-900 text-[10px] font-bold px-2 py-0.5 rounded shadow-md border border-yellow-500 flex items-center gap-1 whitespace-nowrap">
+                                🚌 ${busHere.plate}
+                            </div>
+                            <div class="w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-t-[6px] border-t-yellow-500 mx-auto"></div>
                         </div>
-                        <div class="text-[10px] text-slate-400 truncate max-w-[120px] group-hover:text-slate-300 transition-colors">📍 ${bus.stopName}</div>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-[10px] ${statusColor} font-bold">${statusText}</div>
-                        <div class="text-[9px] text-slate-600 font-mono mt-0.5">${new Date(bus.time).toLocaleTimeString().slice(0,5)}</div>
+                    `;
+                    removeOpacity = true;
+                }
+
+                return `
+                    <div class="relative pl-10 pr-4 py-3 timeline-item ${removeOpacity ? '' : opacity} transition-opacity duration-300">
+                        <div class="timeline-line"></div>
+                        <div class="absolute left-4 top-4 w-3 h-3 rounded-full border-2 ${dotClass} z-10 bg-clip-padding"></div>
+                        ${busHtml}
+                        <div class="flex justify-between items-baseline">
+                            <div class="text-sm ${textClass}">${stopName}</div>
+                            <div class="text-[10px] ${statusColor}">${statusText}</div>
+                        </div>
                     </div>
                 `;
-                return div;
-            };
+            }).join('');
 
-            allDown.forEach(bus => els.sidebarDownList.appendChild(createSidebarItem(bus, true)));
-            allUp.forEach(bus => els.sidebarUpList.appendChild(createSidebarItem(bus, false)));
+            els.sidebarContainer.innerHTML = html;
+        }
 
-            // 2. Dashboard Stats
+        function renderDashboard() {
+            // Avg Times
             const downs = state.completed.filter(t => t.type === 'down');
             const ups = state.completed.filter(t => t.type === 'up');
             els.downAvg.textContent = calcAvg(downs);
             els.upAvg.textContent = calcAvg(ups);
-            
-            const activeDown = [];
-            const activeUp = [];
-            Object.entries(state.tracking).forEach(([plate, trip]) => {
-                if (trip.type === 'down') activeDown.push({plate, ...trip});
-                else activeUp.push({plate, ...trip});
-            });
 
-            els.downCount.textContent = activeDown.length;
-            els.upCount.textContent = activeUp.length;
-            els.downBadge.textContent = `${activeDown.length} 車輛`;
-            els.upBadge.textContent = `${activeUp.length} 車輛`;
-
-            // 3. Tracking Lists
-            renderTrackingList(els.downList, activeDown, 'blue');
-            renderTrackingList(els.upList, activeUp, 'orange');
+            // Active Counts (Excluding Waiting)
+            const activeDown = Object.values(state.tracking).filter(t => t.type === 'down' && !t.isWaiting).length;
+            const activeUp = Object.values(state.tracking).filter(t => t.type === 'up' && !t.isWaiting).length;
+            els.downCount.textContent = activeDown;
+            els.upCount.textContent = activeUp;
         }
 
-        function renderTrackingList(container, list, color) {
-            container.innerHTML = '';
+        function renderTrackingLists() {
+            const activeDown = Object.entries(state.tracking).filter(([k,v]) => v.type === 'down').map(([k,v]) => ({plate:k, ...v}));
+            const activeUp = Object.entries(state.tracking).filter(([k,v]) => v.type === 'up').map(([k,v]) => ({plate:k, ...v}));
+            
+            renderList(els.downList, activeDown, 'blue');
+            renderList(els.upList, activeUp, 'orange');
+        }
+
+        function renderList(container, list, color) {
             if(list.length === 0) {
-                container.innerHTML = `<div class="text-center text-slate-400 text-xs py-10 opacity-50">目前無車輛行駛於此區段</div>`;
+                container.innerHTML = `<div class="text-center text-slate-400 text-xs py-10 opacity-50">目前無車輛</div>`;
                 return;
             }
-            list.sort((a,b) => b.startTime - a.startTime).forEach(bus => {
-                const elapsed = Math.floor((Date.now() - bus.startTime) / 60000);
-                const div = document.createElement('div');
-                div.className = `bg-white p-3 rounded-lg border border-${color}-100 shadow-sm flex justify-between items-center animate-in fade-in slide-in-from-bottom-1`;
-                div.innerHTML = `
-                    <div>
-                        <div class="font-bold text-slate-700">${bus.plate}</div>
-                        <div class="text-[11px] text-slate-500 mt-0.5">📍 ${bus.currentStop}</div>
-                    </div>
-                    <div class="text-right">
-                        <div class="font-mono font-black text-${color}-500 text-xl">${elapsed}<span class="text-[10px] ml-0.5 font-normal text-slate-400">分</span></div>
-                        <div class="text-[9px] text-slate-400">已行駛</div>
+            
+            // 使用 HTML String 批次構建
+            const html = list.sort((a,b) => a.isWaiting - b.isWaiting || b.startTime - a.startTime).map(bus => {
+                let elapsed = Math.floor((Date.now() - bus.startTime) / 60000);
+                if (elapsed < 0) elapsed = 0;
+                
+                let timeHtml = bus.isWaiting 
+                    ? `<span class="text-[10px] bg-slate-200 text-slate-500 px-1.5 py-0.5 rounded">⏳ 待發車</span>`
+                    : `<div class="font-mono font-black text-${color}-500 text-xl">${elapsed}<span class="text-[10px] ml-0.5 font-normal text-slate-400">分</span></div>`;
+                
+                let rowClass = bus.isWaiting ? 'opacity-60' : 'animate-in fade-in slide-in-from-bottom-1';
+
+                return `
+                    <div class="bg-white p-3 rounded-lg border border-${color}-100 shadow-sm flex justify-between items-center ${rowClass} mb-3">
+                        <div>
+                            <div class="font-bold text-slate-700 flex items-center gap-2">
+                                ${bus.plate}
+                                ${!bus.isWaiting ? `<span class="w-1.5 h-1.5 rounded-full bg-${color}-500 animate-pulse"></span>` : ''}
+                            </div>
+                            <div class="text-[11px] text-slate-500 mt-0.5 truncate max-w-[120px]">📍 ${bus.currentStop}</div>
+                        </div>
+                        <div class="text-right">${timeHtml}</div>
                     </div>
                 `;
-                container.appendChild(div);
-            });
+            }).join('');
+            
+            container.innerHTML = html;
         }
 
+        // --- Helpers ---
         function calcAvg(list) {
             if (list.length === 0) return '--';
             const total = list.reduce((sum, t) => sum + parseFloat(t.duration), 0);
@@ -559,50 +570,29 @@
 
         function updateStatus(s) {
             const now = new Date().toLocaleTimeString();
-            if(s==='ok') {
-                els.statusDot.className = 'w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]';
-                els.statusText.textContent = `已更新 ${now}`;
-            } else if(s==='loading') {
-                els.statusDot.className = 'w-2 h-2 rounded-full bg-amber-500 animate-pulse';
-                els.statusText.textContent = '更新中...';
-            } else {
-                els.statusDot.className = 'w-2 h-2 rounded-full bg-rose-500';
-                els.statusText.textContent = '連線重試中';
-            }
+            els.statusText.textContent = s === 'loading' ? '更新中...' : `更新於 ${now}`;
+            if(s==='ok') els.statusDot.className = 'w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]';
+            else if(s==='loading') els.statusDot.className = 'w-2 h-2 rounded-full bg-amber-500 animate-pulse';
+            else els.statusDot.className = 'w-2 h-2 rounded-full bg-rose-500';
         }
 
-        function saveData() {
-            localStorage.setItem('red5_dual_v2', JSON.stringify({
-                tracking: state.tracking,
-                completed: state.completed
-            }));
-        }
-
+        function saveData() { localStorage.setItem('red5_full_v3', JSON.stringify({ tracking: state.tracking, completed: state.completed })); }
         function loadData() {
-            const raw = localStorage.getItem('red5_dual_v2');
-            if (raw) {
-                const d = JSON.parse(raw);
-                state.tracking = d.tracking || {};
-                state.completed = d.completed || [];
-            }
+            const raw = localStorage.getItem('red5_full_v3');
+            if (raw) { const d = JSON.parse(raw); state.tracking = d.tracking || {}; state.completed = d.completed || []; }
         }
-
         function exportCSV() {
-            if (state.completed.length === 0) return alert('無資料可匯出');
-            let csv = "方向,車號,開始時間,結束時間,耗時(分),日期\n";
+            if (state.completed.length === 0) return alert('無資料');
+            let csv = "方向,車號,日期,開始,結束,耗時(分)\n";
             state.completed.forEach(t => {
-                const type = t.type === 'down' ? '下山' : '上山';
-                const start = new Date(t.startTime).toLocaleTimeString();
-                const end = new Date(t.endTime).toLocaleTimeString();
-                csv += `${type},${t.plate},${start},${end},${t.duration},${t.date}\n`;
+                csv += `${t.type==='down'?'下山':'上山'},${t.plate},${t.date},${new Date(t.startTime).toLocaleTimeString()},${new Date(t.endTime).toLocaleTimeString()},${t.duration}\n`;
             });
             const blob = new Blob(["\uFEFF"+csv], {type: 'text/csv;charset=utf-8;'});
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = `紅5_行車記錄_${new Date().toISOString().slice(0,10)}.csv`;
-            link.click();
+            const link = document.createElement("a"); link.href = URL.createObjectURL(blob);
+            link.download = `Red5_Export_${new Date().toISOString().slice(0,10)}.csv`; link.click();
         }
 
+        window.switchSidebar = switchSidebar;
         init();
     </script>
 </body>
