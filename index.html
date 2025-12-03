@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,54 +7,36 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
-
         body {
             font-family: 'Noto Sans TC', sans-serif;
         }
-
         .status-dot {
             height: 12px;
             width: 12px;
             border-radius: 50%;
             display: inline-block;
         }
-
-        .status-green {
-            background-color: #10B981;
-            box-shadow: 0 0 8px #10B981;
-        }
-
-        .status-yellow {
-            background-color: #F59E0B;
-            box-shadow: 0 0 8px #F59E0B;
-        }
-
-        .status-red {
-            background-color: #EF4444;
-            box-shadow: 0 0 8px #EF4444;
-        }
-
+        .status-green { background-color: #10B981; box-shadow: 0 0 8px #10B981; }
+        .status-yellow { background-color: #F59E0B; box-shadow: 0 0 8px #F59E0B; }
+        .status-red { background-color: #EF4444; box-shadow: 0 0 8px #EF4444; }
+        
         /* Custom Scrollbar for logs */
         .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
             height: 6px;
         }
-
         .custom-scrollbar::-webkit-scrollbar-track {
             background: #f1f1f1;
         }
-
         .custom-scrollbar::-webkit-scrollbar-thumb {
             background: #cbd5e1;
             border-radius: 3px;
         }
-
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
     </style>
 </head>
-
 <body class="bg-slate-100 min-h-screen p-3 md:p-6">
     <div class="max-w-7xl mx-auto">
         <!-- Header -->
@@ -67,20 +48,18 @@
                         行駛時間即時監測
                     </h1>
                     <p class="text-slate-500 mt-2 flex items-center gap-2 text-sm md:text-base">
-                        <span class="font-bold text-slate-700">文化大學</span>
-                        <span class="text-slate-400">➔</span>
+                        <span class="font-bold text-slate-700">文化大學</span> 
+                        <span class="text-slate-400">➔</span> 
                         <span class="font-bold text-slate-700">捷運劍潭站</span>
                     </p>
                 </div>
                 <div class="flex flex-col items-end gap-2">
                     <div class="flex items-center gap-2">
-                        <div
-                            class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200">
+                        <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200">
                             <span id="connection-status" class="status-dot status-yellow"></span>
                             <span id="status-text" class="text-xs font-bold text-slate-600">連線初始化...</span>
                         </div>
-                        <div
-                            class="bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100 text-xs text-blue-600 font-mono">
+                        <div class="bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100 text-xs text-blue-600 font-mono">
                             即時更新: <span id="last-updated-time">--:--:--</span>
                         </div>
                     </div>
@@ -184,14 +163,15 @@
                 <div class="p-4 border-b border-slate-100 bg-slate-50 rounded-t-xl flex justify-between items-center">
                     <h2 class="font-bold text-slate-700">📋 完成行駛記錄</h2>
                     <div class="flex gap-2">
-                        <button id="toggle-debug-btn"
-                            class="text-xs bg-slate-200 hover:bg-slate-300 px-2 py-1 rounded text-slate-600">查看原始日誌</button>
+                        <button id="export-btn" class="text-xs bg-green-100 text-green-700 hover:bg-green-200 px-3 py-1 rounded border border-green-200 flex items-center gap-1">
+                            <span>📥</span> 匯出CSV
+                        </button>
+                        <button id="toggle-debug-btn" class="text-xs bg-slate-200 hover:bg-slate-300 px-2 py-1 rounded text-slate-600">日誌</button>
                     </div>
                 </div>
                 <div class="flex-1 overflow-hidden flex flex-col">
                     <!-- Completed Table Header -->
-                    <div
-                        class="grid grid-cols-5 bg-slate-100 text-xs font-bold text-slate-500 py-2 px-4 border-b border-slate-200">
+                    <div class="grid grid-cols-5 bg-slate-100 text-xs font-bold text-slate-500 py-2 px-4 border-b border-slate-200">
                         <div>車號</div>
                         <div>經過起點</div>
                         <div>抵達終點</div>
@@ -205,10 +185,9 @@
                         </div>
                     </div>
                 </div>
-
+                
                 <!-- Debug Log (Hidden by default) -->
-                <div id="debug-log-container"
-                    class="hidden h-48 border-t-2 border-slate-300 bg-slate-900 text-green-400 font-mono text-xs p-4 overflow-y-auto">
+                <div id="debug-log-container" class="hidden h-48 border-t-2 border-slate-300 bg-slate-900 text-green-400 font-mono text-xs p-4 overflow-y-auto">
                     <div class="mb-1 opacity-50">--- 系統日誌開始 ---</div>
                 </div>
             </div>
@@ -228,10 +207,9 @@
             START_STOP_ID: '11073', // 文化大學
             END_STOP_ID: '11121',   // 捷運劍潭站
         };
-
+        
         // Full Stop Map
         const STOPS = {
-            '11187': '陽明山總站',
             '174781': '陽明山總站',
             '11053': '陽明山',
             '125818': '中山樓',
@@ -268,6 +246,9 @@
             '11119': '銘傳大學',
             '11121': '捷運劍潭站(中山)',
         };
+        
+        // Add stop ID map specifically for Route 10821 which might use different IDs or logic
+        // The current logic uses STOPS for display mapping.
 
         // --- State Management ---
         let appState = {
@@ -281,7 +262,7 @@
 
         // --- DOM Elements ---
         const els = {
-            statusDot: document.getElementById('connection-status'),
+            statusDot: document.getElementById('connection-status'), // Ensure this ID matches HTML
             statusText: document.getElementById('status-text'),
             activeList: document.getElementById('active-bus-list'),
             completedList: document.getElementById('completed-log-body'),
@@ -316,7 +297,7 @@
             const savedActive = localStorage.getItem('red5_tracker_active');
             if (savedCompleted) appState.completedTrips = JSON.parse(savedCompleted);
             if (savedActive) appState.activeVehicles = JSON.parse(savedActive);
-
+            
             // Clean up stale active vehicles (> 90 mins)
             const now = Date.now();
             for (let plate in appState.activeVehicles) {
@@ -327,7 +308,7 @@
         }
 
         els.resetBtn.addEventListener('click', () => {
-            if (confirm('確定要清除所有歷史記錄嗎？')) {
+            if(confirm('確定要清除所有歷史記錄嗎？')) {
                 appState.completedTrips = [];
                 appState.activeVehicles = {};
                 saveData();
@@ -339,10 +320,38 @@
             els.debugLog.classList.toggle('hidden');
         });
 
+        const exportBtn = document.getElementById('export-btn');
+        if (exportBtn) {
+            exportBtn.addEventListener('click', () => {
+                const trips = appState.completedTrips;
+                if (trips.length === 0) {
+                    alert('目前沒有資料可供匯出');
+                    return;
+                }
+                
+                let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+                csvContent += "車號,經過起點,抵達終點,總耗時(分),日期\n";
+                
+                trips.forEach(t => {
+                    const start = new Date(t.startTime).toLocaleTimeString();
+                    const end = new Date(t.endTime).toLocaleTimeString();
+                    csvContent += `${t.plate},${start},${end},${t.duration},${t.date}\n`;
+                });
+                
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", `bus_red5_data_${new Date().toISOString().slice(0,10)}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+        }
+
         // --- Core Logic: Fetching & Parsing ---
         async function fetchData() {
             setConnectionStatus('loading');
-
+            
             const proxy = CONFIG.PROXIES[appState.proxyIndex];
             // Ensure URL is encoded properly for proxy
             const url = proxy + encodeURIComponent(CONFIG.API_URL);
@@ -354,14 +363,14 @@
                 });
 
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
+                
                 let data = await response.json();
-
+                
                 // AllOrigins wraps the response
                 if (data.contents) {
                     try {
                         data = JSON.parse(data.contents);
-                    } catch (e) {
+                    } catch(e) {
                         // Sometimes it's already an object if not double encoded
                     }
                 }
@@ -371,21 +380,21 @@
                 }
 
                 processBusData(data);
-
+                
                 setConnectionStatus('success');
                 appState.lastFetchTime = new Date();
-                if (els.lastUpdated) els.lastUpdated.textContent = appState.lastFetchTime.toLocaleTimeString();
+                if(els.lastUpdated) els.lastUpdated.textContent = appState.lastFetchTime.toLocaleTimeString();
             } catch (error) {
                 console.error("Fetch error:", error);
                 log("連線錯誤", `Proxy ${appState.proxyIndex} 失敗: ${error.message}`);
-
+                
                 appState.proxyIndex = (appState.proxyIndex + 1) % CONFIG.PROXIES.length;
-
+                
                 if (appState.proxyIndex === 0) {
-                    setConnectionStatus('error');
-                    log("系統提示", "所有連線失敗，啟用模擬模式");
-                    simulateData();
-                    if (els.lastUpdated) els.lastUpdated.textContent = new Date().toLocaleTimeString();
+                     setConnectionStatus('error');
+                     log("系統提示", "所有連線失敗，啟用模擬模式");
+                     simulateData();
+                     if(els.lastUpdated) els.lastUpdated.textContent = new Date().toLocaleTimeString();
                 }
             }
         }
@@ -408,7 +417,7 @@
                                     let busTime = now;
                                     if (parts.length > 11 && parts[11].length === 12) {
                                         const t = parts[11];
-                                        busTime = new Date(`20${t.substring(0, 2)}-${t.substring(2, 4)}-${t.substring(4, 6)}T${t.substring(6, 8)}:${t.substring(8, 10)}:${t.substring(10, 12)}`).getTime();
+                                        busTime = new Date(`20${t.substring(0,2)}-${t.substring(2,4)}-${t.substring(4,6)}T${t.substring(6,8)}:${t.substring(8,10)}:${t.substring(10,12)}`).getTime();
                                     }
 
                                     buses.push({
@@ -425,11 +434,11 @@
             }
 
             appState.allBuses = buses;
-
+            
             // Update Tracking
             buses.forEach(bus => {
                 const plate = bus.plate;
-
+                
                 // 1. Start Tracking
                 if (bus.stopId == CONFIG.START_STOP_ID) {
                     if (!appState.activeVehicles[plate]) {
@@ -446,19 +455,19 @@
                         appState.activeVehicles[plate].currentStop = bus.stopName;
                     }
                 }
-
+                
                 // 2. Update Existing
                 if (appState.activeVehicles[plate]) {
                     appState.activeVehicles[plate].lastUpdate = now;
                     appState.activeVehicles[plate].currentStop = bus.stopName;
-
+                    
                     // 3. Complete Trip
                     if (bus.stopId == CONFIG.END_STOP_ID) {
                         const trip = appState.activeVehicles[plate];
                         const endTime = bus.timestamp;
                         const durationMs = endTime - trip.startTime;
                         const durationMin = (durationMs / 60000).toFixed(1);
-
+                        
                         if (durationMin > 5) {
                             log("行程完成", `車輛 ${plate} 抵達終點，耗時 ${durationMin} 分`);
                             appState.completedTrips.unshift({
@@ -474,7 +483,7 @@
                     }
                 }
             });
-
+            
             saveData();
             render();
         }
@@ -483,11 +492,11 @@
         function simulateData() {
             setConnectionStatus('simulating');
             // Keep existing buses
-
+            
             // 1. Spawn new bus occasionally at start
             if (Math.random() > 0.8) {
                 const plate = "SIM-" + Math.floor(Math.random() * 999);
-                if (!appState.activeVehicles[plate]) {
+                if(!appState.activeVehicles[plate]) {
                     appState.activeVehicles[plate] = {
                         startTime: Date.now(),
                         startStop: STOPS[CONFIG.START_STOP_ID],
@@ -501,18 +510,18 @@
             appState.allBuses = [];
 
             // 2. Update existing simulated buses
-            for (let plate in appState.activeVehicles) {
+            for(let plate in appState.activeVehicles) {
                 const trip = appState.activeVehicles[plate];
                 const elapsed = Date.now() - trip.startTime;
-
+                
                 // Simulate movement
                 trip.lastUpdate = Date.now();
                 trip.currentStop = "行駛中...";
-
+                
                 // Finish trip after random time (15-25s for demo speed)
-                if (elapsed > 15000 && Math.random() > 0.8) {
-                    const duration = (15 + Math.random() * 10).toFixed(1);
-                    appState.completedTrips.unshift({
+                if(elapsed > 15000 && Math.random() > 0.8) {
+                     const duration = (15 + Math.random() * 10).toFixed(1);
+                     appState.completedTrips.unshift({
                         plate: plate,
                         startTime: trip.startTime,
                         endTime: Date.now(),
@@ -531,7 +540,7 @@
                     });
                 }
             }
-
+            
             saveData();
             render();
         }
@@ -542,25 +551,25 @@
             const trips = appState.completedTrips;
             els.sampleCount.textContent = trips.length;
             els.trackingCount.textContent = Object.keys(appState.activeVehicles).length;
-
+            
             if (trips.length > 0) {
                 const total = trips.reduce((acc, cur) => acc + parseFloat(cur.duration), 0);
                 els.avgTime.textContent = (total / trips.length).toFixed(1);
-
+                
                 const times = trips.map(t => parseFloat(t.duration));
                 els.minMaxTime.textContent = `${Math.min(...times).toFixed(1)} / ${Math.max(...times).toFixed(1)}`;
             }
 
             // Active List (All Buses)
             els.activeList.innerHTML = '';
-
+            
             // Create a unique list of buses, preferring tracked ones
             const displayMap = new Map();
             appState.allBuses.forEach(b => displayMap.set(b.plate, b));
-
+            
             // Ensure actively tracked buses are shown even if momentarily missed in allBuses (e.g. simulation gap)
             Object.keys(appState.activeVehicles).forEach(plate => {
-                if (!displayMap.has(plate)) {
+                if(!displayMap.has(plate)) {
                     const info = appState.activeVehicles[plate];
                     displayMap.set(plate, {
                         plate: plate,
@@ -571,14 +580,14 @@
             });
 
             const sortedBuses = Array.from(displayMap.values()).sort((a, b) => {
-                // Put tracked buses first
-                const aTracked = !!appState.activeVehicles[a.plate];
-                const bTracked = !!appState.activeVehicles[b.plate];
-                if (aTracked && !bTracked) return -1;
-                if (!aTracked && bTracked) return 1;
-                return 0;
+                 // Put tracked buses first
+                 const aTracked = !!appState.activeVehicles[a.plate];
+                 const bTracked = !!appState.activeVehicles[b.plate];
+                 if (aTracked && !bTracked) return -1;
+                 if (!aTracked && bTracked) return 1;
+                 return 0;
             });
-
+            
             if (sortedBuses.length === 0) {
                 els.activeList.innerHTML = '<div class="text-center text-slate-400 mt-4 text-sm">目前線上無車輛行駛</div>';
             } else {
@@ -586,7 +595,7 @@
                     const trackingInfo = appState.activeVehicles[bus.plate];
                     let statusHtml = '';
                     let cardClass = 'bg-white border-slate-200';
-
+                    
                     if (trackingInfo) {
                         const elapsed = Math.floor((Date.now() - trackingInfo.startTime) / 60000);
                         statusHtml = `
@@ -642,7 +651,7 @@
 
         function formatTime(ms) {
             const d = new Date(ms);
-            return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}:${d.getSeconds().toString().padStart(2, '0')}`;
+            return `${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}:${d.getSeconds().toString().padStart(2,'0')}`;
         }
 
         function log(type, msg) {
@@ -676,5 +685,4 @@
 
     </script>
 </body>
-
 </html>

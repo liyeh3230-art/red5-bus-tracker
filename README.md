@@ -1,37 +1,99 @@
 # 🚀 如何發布與佈署此專案
+
 這個專案是一個**單頁式網頁應用程式 (Single Page Application)**，完全由前端 HTML/JS 組成。這意味著您可以非常輕鬆地將其免費佈署到網路上。
+
 以下是三種最簡單的免費佈署方式：
+
 ---
+
 ## 方法一：Netlify Drop (最簡單、最快)
 **適合：** 不想使用 Git 或指令，只需拖拉檔案即可上線。
+
 1. 準備檔案：確保您的 `index.html` 檔案已儲存在電腦的一個資料夾中（例如命名為 `bus-tracker`）。
 2. 前往 [Netlify Drop](https://app.netlify.com/drop)。
 3. 將您的資料夾 **拖曳** 到網頁上的虛線區域中。
 4. 等待幾秒鐘，Netlify 會自動產生一個網址（例如 `https://agitated-curie-xxxx.netlify.app`）。
 5. **完成！** 您的網站已經上線。
+
 ---
+
 ## 方法二：GitHub Pages (開發者推薦)
 **適合：** 如果您已經有 GitHub 帳號，且希望持續維護程式碼。
+
 1. 在 [GitHub](https://github.com) 上建立一個新的 Repository（例如 `red5-bus-tracker`）。
 2. 將 `index.html` 上傳到該 Repository。
 3. 進入 Repository 的 **Settings (設定)** > **Pages**。
 4. 在 **Build and deployment** 下的 **Branch** 選擇 `main` (或 master) 並點擊 **Save**。
 5. 等待約 1-2 分鐘，重新整理頁面，上方會出現您的網站網址（例如 `https://yourname.github.io/red5-bus-tracker/`）。
+
 ---
+
 ## 方法三：Vercel
 **適合：** 追求極致效能與全球 CDN 加速。
+
 1. 前往 [Vercel](https://vercel.com) 並註冊/登入。
 2. 點擊 **Add New...** > **Project**。
 3. 連結您的 GitHub Repository (如果您用了方法二)。
 4. 或者安裝 Vercel CLI (`npm i -g vercel`)，在專案資料夾輸入 `vercel` 指令即可發布。
+
 ---
+
+## 📂 檔案用途說明 (必讀!)
+
+本專案包含三個主要檔案，請依照下列指示放置：
+
+| 檔案 | 上傳位置 | 說明 |
+| :--- | :--- | :--- |
+| `index.html` | **GitHub** | **網頁主程式**。上傳後透過 GitHub Pages 產生網址，供您查看即時地圖。 |
+| `README.md` | **GitHub** | **專案說明書**。上傳後會在儲存庫首頁顯示教學文件。 |
+| `cloud-tracker.gs` | **Google 試算表** | **雲端機器人**。⚠️ **請勿僅上傳至 GitHub**。您必須將此檔案內容**複製**並貼上至 Google 試算表的 Apps Script 編輯器中，才能達成 24 小時自動記錄。 |
+
+---
+
+## ☁️ 進階：如何達成 24 小時不間斷雲端記錄？
+
+如果您希望電腦關機後，系統仍能持續記錄公車資料並計算平均時間，請使用本專案提供的 **Google Apps Script** 解決方案。這完全**免費**且**無需維護伺服器**。
+
+### 步驟 1：建立 Google Sheet
+1. 前往 [Google Sheets](https://sheets.new) 建立一個新的試算表。
+2. 將試算表命名為「紅5公車追蹤記錄」。
+
+### 步驟 2：安裝腳本
+1. 在試算表選單中，點選 **「擴充功能」** > **「Apps Script」**。
+2. 刪除編輯器中預設的程式碼。
+3. 開啟本專案中的 `cloud-tracker.gs` 檔案，複製所有內容，貼上到編輯器中。
+4. 按下上方磁片圖示💾儲存，專案名稱可取為「BusTracker」。
+
+### 步驟 3：設定自動化排程 (Trigger)
+⚠️ **請務必依照順序選擇，選項才會出現：**
+
+1. 在 Apps Script 左側選單點擊 ⏰ **「觸發條件」(Triggers)**。
+2. 點擊右下角藍色按鈕 **「新增觸發條件」**。
+3. 在跳出的視窗中依序設定：
+   - 哪一個函式：`main`
+   - 哪一個部署作業：`前端` (Head)
+   - **選取活動來源**：選擇 **「時間驅動」** (Time-driven)
+   - **選取時間型觸發條件類型** (重要!)：原本可能是"小時"，請改選 **「分鐘計時器」** (Minutes timer)
+   - **選取分鐘間隔**：現在您可以看到並選擇 **「每分鐘」** (Every minute)
+4. 點擊「儲存」。
+5. Google 會跳出「Authorization required」，請點擊 **「審查權限」** > 選擇您的 Google 帳號 > 左下角的 **「進階」** > **「前往... (不安全)」** > **「允許」**。
+
+### ✅ 完成！
+現在，Google 的伺服器會每分鐘自動執行一次程式，幫您追蹤紅5公車。資料會自動填入您的試算表中，即使您睡覺時也會持續運作。
+
+---
+
 ## ⚠️ 重要注意事項：CORS 代理
+
 本專案依賴公開的 **CORS Proxy 服務** (如 `corsproxy.io`, `allorigins.win`) 來讀取政府的 API 資料，因為政府伺服器未開放直接的前端連線權限。
+
 **在正式佈署環境中需注意：**
 1. **穩定性**：公開 Proxy 有時會不穩定或限制流量。
 2. **建議解法**：若您希望長期穩定營運，建議自行建立一個簡單的後端轉發服務 (例如使用 Cloudflare Workers 或 Vercel Functions)。
+
 ### 使用 Cloudflare Workers 建立私有 Proxy (進階)
 如果您發現連線不穩，可以建立一個 `worker.js`：
+
 ```javascript
 export default {
   async fetch(request) {
