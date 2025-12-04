@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="zh-TW">
 
 <head>
@@ -88,61 +87,49 @@
 
 <body class="bg-slate-100 text-slate-800 h-screen flex flex-col overflow-hidden">
 
-    <!-- 📱 Mobile / Desktop Wrapper -->
+    <!-- 3-Column Layout on Desktop, Tab Layout on Mobile -->
     <div class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
 
-        <!-- ============================== -->
-        <!-- 🗺️ VIEW: ROUTE TIMELINE (Sidebar on Desktop) -->
-        <!-- ============================== -->
+        <!-- 1. SIDEBAR: ROUTE TIMELINE -->
         <aside id="view-route"
-            class="tab-content md:flex w-full md:w-[380px] bg-white flex-col shrink-0 z-20 shadow-xl border-r border-slate-200 h-full md:h-auto absolute md:relative inset-0">
-            <!-- Header -->
+            class="tab-content md:flex w-full md:w-[360px] lg:w-[380px] bg-white flex-col shrink-0 z-20 shadow-xl border-r border-slate-200 h-full md:h-auto absolute md:relative inset-0">
             <div class="p-4 border-b border-slate-200 bg-slate-50 shrink-0 sticky top-0 z-30">
                 <div class="flex items-center gap-3 mb-3">
                     <span class="bg-red-600 text-white font-bold px-2 py-0.5 rounded text-sm tracking-wider">紅5</span>
                     <h1 class="font-bold text-slate-800">路線動態</h1>
                     <div class="ml-auto md:hidden text-xs text-slate-400" id="mobile-status-text">連線中...</div>
                 </div>
-                <!-- Direction Tabs -->
                 <div class="flex p-1 bg-slate-200 rounded-lg">
                     <button onclick="switchSidebar('down')" id="tab-down"
-                        class="flex-1 py-2 text-xs font-bold rounded-md transition-all bg-white text-blue-600 shadow-sm">
-                        📉 下山 (往劍潭)
-                    </button>
+                        class="flex-1 py-2 text-xs font-bold rounded-md transition-all bg-white text-blue-600 shadow-sm">📉
+                        下山 (往劍潭)</button>
                     <button onclick="switchSidebar('up')" id="tab-up"
-                        class="flex-1 py-2 text-xs font-bold rounded-md transition-all text-slate-500 hover:text-slate-700">
-                        📈 上山 (往文大)
-                    </button>
+                        class="flex-1 py-2 text-xs font-bold rounded-md transition-all text-slate-500 hover:text-slate-700">📈
+                        上山 (往文大)</button>
                 </div>
             </div>
 
-            <!-- Timeline List -->
-            <div class="flex-1 overflow-y-auto p-0 relative scroll-hide bg-white" id="sidebar-container">
+            <!-- 修正：手機版增加底部間距 (pb-24) 防止被導航列遮擋 -->
+            <div class="flex-1 overflow-y-auto p-0 pb-24 md:pb-0 relative scroll-hide bg-white" id="sidebar-container">
                 <div class="p-10 text-center text-slate-400 text-xs">載入路線資料中...</div>
             </div>
 
-            <!-- Footer Status (Desktop Only) -->
             <div
                 class="p-2 border-t border-slate-200 bg-slate-50 text-[10px] text-slate-500 hidden md:flex justify-between items-center">
                 <span id="last-update-time">連線中...</span>
-                <span id="connection-status" class="flex items-center gap-1">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span> 連線正常
-                </span>
+                <span id="connection-status" class="flex items-center gap-1"><span
+                        class="w-2 h-2 rounded-full bg-emerald-500"></span> 連線正常</span>
             </div>
         </aside>
 
-
-        <!-- ============================== -->
-        <!-- 🏠 VIEW: DASHBOARD (Main) -->
-        <!-- ============================== -->
+        <!-- 2. MAIN: DASHBOARD -->
         <main id="view-home"
             class="tab-content active md:flex flex-1 flex-col h-full relative bg-slate-50 w-full absolute md:relative inset-0 overflow-y-auto md:overflow-hidden">
 
-            <!-- Top Dashboard Cards -->
-            <header class="bg-white border-b border-slate-200 p-4 md:p-6 shadow-sm z-10 shrink-0">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                    <!-- Card: Downhill -->
+            <!-- Stats Cards -->
+            <header class="bg-white border-b border-slate-200 p-4 shadow-sm z-10 shrink-0">
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                    <!-- Downhill Card -->
                     <div
                         class="bg-gradient-to-br from-blue-50 to-white border border-blue-100 rounded-xl p-4 relative overflow-hidden shadow-sm group">
                         <div
@@ -157,9 +144,8 @@
                                         id="down-avg">--</span>
                                     <span class="text-sm text-blue-400 font-bold">分 (平均)</span>
                                 </div>
-                                <div class="text-[11px] text-slate-500 mt-1">
-                                    最近一班: <span id="down-last" class="font-bold text-blue-600">--</span> 分
-                                </div>
+                                <div class="text-[11px] text-slate-500 mt-1">最近一班: <span id="down-last"
+                                        class="font-bold text-blue-600">--</span> 分</div>
                             </div>
                             <div class="text-right">
                                 <div class="text-2xl font-bold text-slate-700" id="down-count">0</div>
@@ -167,8 +153,7 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Card: Uphill -->
+                    <!-- Uphill Card -->
                     <div
                         class="bg-gradient-to-br from-orange-50 to-white border border-orange-100 rounded-xl p-4 relative overflow-hidden shadow-sm group">
                         <div
@@ -183,9 +168,8 @@
                                         id="up-avg">--</span>
                                     <span class="text-sm text-orange-400 font-bold">分 (平均)</span>
                                 </div>
-                                <div class="text-[11px] text-slate-500 mt-1">
-                                    最近一班: <span id="up-last" class="font-bold text-orange-600">--</span> 分
-                                </div>
+                                <div class="text-[11px] text-slate-500 mt-1">最近一班: <span id="up-last"
+                                        class="font-bold text-orange-600">--</span> 分</div>
                             </div>
                             <div class="text-right">
                                 <div class="text-2xl font-bold text-slate-700" id="up-count">0</div>
@@ -193,73 +177,59 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </header>
 
-            <!-- Content Split -->
-            <div class="flex-1 grid grid-cols-1 md:grid-cols-2 overflow-hidden bg-slate-50 pb-20 md:pb-0">
-
-                <!-- Downhill Tracking List -->
-                <section class="border-r border-slate-200 flex flex-col h-full relative">
+            <!-- Lists Split View -->
+            <div class="flex-1 flex flex-col xl:flex-row overflow-hidden bg-slate-50 pb-20 md:pb-0">
+                <!-- Down List -->
+                <section class="flex-1 flex flex-col relative border-b xl:border-b-0 xl:border-r border-slate-200">
                     <div
                         class="px-4 py-2 bg-slate-100/80 backdrop-blur border-b border-slate-200 text-xs font-bold text-slate-500 sticky top-0 z-10">
-                        📉 下山監測 (行駛中)
-                    </div>
+                        📉 下山監測 (行駛中)</div>
                     <div class="flex-1 overflow-y-auto p-4 space-y-3 scroll-hide" id="down-list"></div>
                 </section>
-
-                <!-- Uphill Tracking List -->
-                <section class="flex flex-col h-full relative">
+                <!-- Up List -->
+                <section class="flex-1 flex flex-col relative">
                     <div
                         class="px-4 py-2 bg-slate-100/80 backdrop-blur border-b border-slate-200 text-xs font-bold text-slate-500 sticky top-0 z-10">
-                        📈 上山監測 (行駛中)
-                    </div>
+                        📈 上山監測 (行駛中)</div>
                     <div class="flex-1 overflow-y-auto p-4 space-y-3 scroll-hide" id="up-list"></div>
                 </section>
-
             </div>
         </main>
 
-
-        <!-- ============================== -->
-        <!-- 📜 VIEW: HISTORY (Log) -->
-        <!-- ============================== -->
+        <!-- 3. RIGHT: HISTORY LOG -->
         <div id="view-history"
-            class="tab-content flex-1 flex-col h-full relative bg-slate-50 w-full absolute md:relative inset-0 z-30">
-            <div class="p-4 bg-white border-b border-slate-200 flex justify-between items-center sticky top-0 z-10">
-                <h2 class="font-bold text-lg">📜 歷史行駛紀錄</h2>
+            class="tab-content md:flex flex-1 md:max-w-[400px] flex-col h-full relative bg-white md:border-l border-slate-200 w-full absolute md:relative inset-0 z-30">
+            <div
+                class="p-4 bg-white border-b border-slate-200 flex justify-between items-center sticky top-0 z-10 shrink-0 h-[73px]">
+                <h2 class="font-bold text-lg">📜 歷史紀錄</h2>
                 <button onclick="exportCSV()"
                     class="text-xs bg-slate-800 text-white px-3 py-1.5 rounded hover:bg-slate-700 flex items-center gap-1">
                     <span>📥</span> 下載 CSV
                 </button>
             </div>
-            <div class="flex-1 overflow-y-auto p-4 pb-20 md:pb-4 scroll-hide">
-                <div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
-                    <table class="w-full text-xs md:text-sm text-left">
-                        <thead class="bg-slate-50 text-slate-500 font-bold border-b border-slate-200">
-                            <tr>
-                                <th class="p-3">方向</th>
-                                <th class="p-3">車號</th>
-                                <th class="p-3 hidden md:table-cell">日期</th>
-                                <th class="p-3">時間</th>
-                                <th class="p-3 text-right">耗時</th>
-                            </tr>
-                        </thead>
-                        <tbody id="history-table-body" class="divide-y divide-slate-100">
-                            <!-- Dynamic Content will be inserted here -->
-                        </tbody>
-                    </table>
-                    <div id="history-empty" class="p-8 text-center text-slate-400 text-sm hidden">
-                        尚無完成的行駛紀錄
-                    </div>
-                </div>
+            <div class="flex-1 overflow-y-auto p-0 pb-20 md:pb-0 scroll-hide bg-slate-50">
+                <table class="w-full text-xs text-left border-collapse">
+                    <thead class="bg-slate-100 text-slate-500 font-bold border-b border-slate-200 sticky top-0 z-10">
+                        <tr>
+                            <th class="p-3">車號</th>
+                            <th class="p-3">時間</th>
+                            <th class="p-3 text-right">耗時</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-table-body" class="divide-y divide-slate-100 bg-white">
+                        <!-- Dynamic -->
+                    </tbody>
+                </table>
+                <div id="history-empty" class="p-10 text-center text-slate-400 text-xs hidden">尚無紀錄</div>
             </div>
         </div>
 
     </div>
 
-    <!-- 📱 Mobile Bottom Navigation -->
+    <!-- Mobile Navigation -->
     <nav
         class="md:hidden fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around items-center h-16 z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] pb-safe">
         <button onclick="switchTab('home')"
@@ -282,95 +252,58 @@
         </button>
     </nav>
 
-    <!-- JavaScript Logic -->
+    <!-- Logic -->
     <script>
-        // --- Config ---
         const CONFIG = {
             API_URLS: [
-                'https://pda5284.gov.taipei/MQS/SubRouteDyna?csvsubrouteid=158420', // 下山 1
-                'https://pda5284.gov.taipei/MQS/SubRouteDyna?csvsubrouteid=157609', // 下山 2
-                'https://pda5284.gov.taipei/MQS/SubRouteDyna?csvsubrouteid=158419', // 上山 1
-                'https://pda5284.gov.taipei/MQS/SubRouteDyna?csvsubrouteid=157610'  // 上山 2
+                'https://pda5284.gov.taipei/MQS/SubRouteDyna?csvsubrouteid=158420',
+                'https://pda5284.gov.taipei/MQS/SubRouteDyna?csvsubrouteid=157609',
+                'https://pda5284.gov.taipei/MQS/SubRouteDyna?csvsubrouteid=158419',
+                'https://pda5284.gov.taipei/MQS/SubRouteDyna?csvsubrouteid=157610'
             ],
-            PROXIES: [
-                'https://corsproxy.io/?',
-                'https://api.allorigins.win/raw?url=',
-                'https://cors-anywhere.herokuapp.com/'
-            ],
+            PROXIES: ['https://corsproxy.io/?', 'https://api.allorigins.win/raw?url=', 'https://cors-anywhere.herokuapp.com/'],
             REFRESH_MS: 3000,
-            STOPS: {
-                DOWN_START: '11073', DOWN_END: '11121',
-                UP_START: '11123', UP_END: '11169'
-            }
+            STOPS: { DOWN_START: '11073', DOWN_END: '11121', UP_START: '11123', UP_END: '11169' }
         };
 
-        // Official TTE Map
         const TTE_MAP = { '0': '進站中', '': '未發車', '-1': '未發車', '-2': '交管不停', '-3': '末班已過', '-4': '今日未營運' };
         const FIRST_STOP_MAP = { "158420": "174781", "157609": "174781", "158419": "134539", "157610": "134539" };
-
-        // Full Stop Names
         const STOP_NAMES = {
-            // 下山
-            '174781': '陽明山總站', '11053': '陽明山', '125818': '中山樓', '11057': '教師中心',
-            '11059': '聯勤陽明山招待所', '11061': '福壽橋', '11063': '格致大亨路口', '11065': '磺溪底',
-            '58228': '文化大學一', '11071': '陽明天主堂', '11073': '文化大學', '11075': '山仔后派出所',
-            '11077': '格致國中', '11079': '下竹林', '11081': '新安', '11083': '白雲山莊',
-            '11085': '明德新村', '11087': '陽明山國小', '11089': '福音', '11091': '陽明教養院',
-            '11093': '永福(林語堂故居)', '11095': '永嶺', '11097': '拔子埔', '11099': '嶺頭',
-            '11101': '華興中學', '11103': '芝蘭新村', '11105': '岩山里一', '11107': '岩山里',
-            '11109': '泰北中學', '11111': '士林官邸(中正)', '11113': '福林國小', '11115': '捷運士林站',
-            '11117': '台電台北北區營業處', '11119': '銘傳大學', '11121': '捷運劍潭站',
-            // 上山
-            '11123': '捷運劍潭站(北藝中心)', '11125': '小北街', '11051': '士林區農會', '11127': '捷運士林站(中正)',
-            '11129': '福林國小', '11131': '士林官邸(中正)', '11133': '泰北中學', '11135': '岩山里',
-            '11137': '岩山里一', '11139': '芝蘭新村', '11141': '華興中學', '11143': '嶺頭',
-            '11145': '拔子埔', '11147': '永嶺', '11149': '永福(林語堂故居)', '11151': '陽明教養院',
-            '11153': '福音', '11155': '陽明山國小', '11157': '明德新村', '11159': '白雲山莊',
-            '11161': '新安', '11163': '下竹林', '11165': '格致國中', '11167': '山仔后派出所',
-            '11169': '文化大學', '11173': '文化大學一', '11175': '陽明天主堂', '11177': '磺溪底',
-            '11179': '格致大亨路口', '11181': '福壽橋', '11183': '聯勤陽明山招待所', '11055': '錫安堂',
-            '11185': '教師中心', '125817': '中山樓', '57747': '陽明山', '11187': '陽明山總站'
+            '174781': '陽明山總站', '11053': '陽明山', '125818': '中山樓', '11057': '教師中心', '11059': '聯勤陽明山招待所', '11061': '福壽橋', '11063': '格致大亨路口', '11065': '磺溪底',
+            '58228': '文化大學一', '11071': '陽明天主堂', '11073': '文化大學', '11075': '山仔后派出所', '11077': '格致國中', '11079': '下竹林', '11081': '新安', '11083': '白雲山莊',
+            '11085': '明德新村', '11087': '陽明山國小', '11089': '福音', '11091': '陽明教養院', '11093': '永福(林語堂故居)', '11095': '永嶺', '11097': '拔子埔', '11099': '嶺頭',
+            '11101': '華興中學', '11103': '芝蘭新村', '11105': '岩山里一', '11107': '岩山里', '11109': '泰北中學', '11111': '士林官邸(中正)', '11113': '福林國小', '11115': '捷運士林站',
+            '11117': '台電台北北區營業處', '11119': '銘傳大學', '11121': '捷運劍潭站', '11123': '捷運劍潭站(北藝中心)', '11125': '小北街', '11051': '士林區農會', '11127': '捷運士林站(中正)',
+            '11129': '福林國小', '11131': '士林官邸(中正)', '11133': '泰北中學', '11135': '岩山里', '11137': '岩山里一', '11139': '芝蘭新村', '11141': '華興中學', '11143': '嶺頭',
+            '11145': '拔子埔', '11147': '永嶺', '11149': '永福(林語堂故居)', '11151': '陽明教養院', '11153': '福音', '11155': '陽明山國小', '11157': '明德新村', '11159': '白雲山莊',
+            '11161': '新安', '11163': '下竹林', '11165': '格致國中', '11167': '山仔后派出所', '11169': '文化大學', '11173': '文化大學一', '11175': '陽明天主堂', '11177': '磺溪底',
+            '11179': '格致大亨路口', '11181': '福壽橋', '11183': '聯勤陽明山招待所', '11055': '錫安堂', '11185': '教師中心', '125817': '中山樓', '57747': '陽明山', '11187': '陽明山總站'
         };
 
-        // --- State ---
-        let state = {
-            tracking: {},
-            completed: [],
-            proxyIndex: 0,
-            allBuses: [],
-            routeStops: { down: [], up: [] },
-            activeSidebar: 'down'
-        };
+        let state = { tracking: {}, completed: [], proxyIndex: 0, allBuses: [], routeStops: { down: [], up: [] }, activeSidebar: 'down' };
 
-        // --- Init ---
         function init() {
             loadData();
             fetchData();
             setInterval(fetchData, CONFIG.REFRESH_MS);
-
-            // Responsive UI Init
             if (window.innerWidth >= 768) {
+                // Desktop: Show all 3 columns
                 document.getElementById('view-route').classList.add('active');
                 document.getElementById('view-home').classList.add('active');
-                document.getElementById('view-history').classList.remove('active');
+                document.getElementById('view-history').classList.add('active');
             } else {
                 switchTab('home');
             }
         }
 
-        // --- Fetch Logic ---
         async function fetchData() {
             updateStatus('loading');
             const proxy = CONFIG.PROXIES[state.proxyIndex];
             const busMap = new Map();
             let fetchedStops = { down: null, up: null };
-
             try {
-                const promises = CONFIG.API_URLS.map(url =>
-                    fetch(proxy + encodeURIComponent(url)).then(r => r.ok ? r.json() : null).catch(e => null)
-                );
+                const promises = CONFIG.API_URLS.map(url => fetch(proxy + encodeURIComponent(url)).then(r => r.ok ? r.json() : null).catch(e => null));
                 const results = await Promise.all(promises);
-
                 results.forEach((data, index) => {
                     if (data) {
                         if (data.contents) try { data = JSON.parse(data.contents); } catch (e) { }
@@ -380,17 +313,13 @@
                         parseBusData(data, busMap, dir);
                     }
                 });
-
                 if (fetchedStops.down) state.routeStops.down = fetchedStops.down;
                 if (fetchedStops.up) state.routeStops.up = fetchedStops.up;
-
                 state.allBuses = Array.from(busMap.values());
                 updateTracking(state.allBuses);
                 updateStatus('ok');
                 render();
-
             } catch (e) {
-                console.error(e);
                 state.proxyIndex = (state.proxyIndex + 1) % CONFIG.PROXIES.length;
                 updateStatus('error');
             }
@@ -401,120 +330,58 @@
             data.SubRoute.forEach(sub => {
                 if (!sub.Bus) return;
                 sub.Bus.forEach(bus => {
-                    if (!bus.a2) return;
-                    if (/^TEST.*$/g.test(bus.num)) return;
-
-                    // Official Filtering Logic
-                    if (bus.a1) {
-                        const a1 = bus.a1.split(',');
-                        if (a1[3] === "2" || a1[4] === "99") return;
-                    }
+                    if (!bus.a2 || /^TEST.*$/g.test(bus.num)) return;
+                    if (bus.a1 && (bus.a1.split(',')[3] === "2" || bus.a1.split(',')[4] === "99")) return;
                     const parts = bus.a2.split(',');
-                    if (parts.length <= 11) return;
-                    if (parts[3] === "2" || parts[4] === "99") return;
-
-                    // Strict Active Filter: Status must be '0'
-                    if (parts[4] !== '0') return;
-
+                    if (parts.length <= 11 || parts[3] === "2" || parts[4] === "99" || parts[4] !== '0') return;
                     const timeStr = parts[11];
                     if (timeStr && timeStr.length >= 12) {
                         const busTime = Date.parse("20" + timeStr.substr(0, 2) + "-" + timeStr.substr(2, 2) + "-" + timeStr.substr(4, 2) + "T" + timeStr.substr(6, 2) + ":" + timeStr.substr(8, 2) + ":" + timeStr.substr(10, 2));
                         if (busTime < okDataMS) return;
                     }
-
                     const busStopId = parts[7];
-                    const subRouteId = parts[5];
-                    if (parts[8] === "1" && FIRST_STOP_MAP[subRouteId] && busStopId == FIRST_STOP_MAP[subRouteId]) return;
-
-                    busMap.set(bus.num, {
-                        plate: bus.num,
-                        stopId: busStopId,
-                        stopName: STOP_NAMES[busStopId] || `站點 ${busStopId}`,
-                        time: Date.now(),
-                        direction: direction,
-                        a2: bus.a2,
-                        type: bus.type
-                    });
+                    if (parts[8] === "1" && FIRST_STOP_MAP[parts[5]] && busStopId == FIRST_STOP_MAP[parts[5]]) return;
+                    busMap.set(bus.num, { plate: bus.num, stopId: busStopId, stopName: STOP_NAMES[busStopId] || `站點 ${busStopId}`, time: Date.now(), direction: direction, a2: bus.a2, type: bus.type });
                 });
             });
         }
 
-        // --- Tracking Logic ---
         function updateTracking(currentBuses) {
             const now = Date.now();
             currentBuses.forEach(bus => {
                 const plate = bus.plate;
                 const stopId = bus.stopId;
-
-                // 1. Down Start
                 if (stopId === CONFIG.STOPS.DOWN_START) {
-                    if (!state.tracking[plate] || state.tracking[plate].type !== 'down') {
-                        state.tracking[plate] = { type: 'down', startTime: now, startStop: '文化大學', lastUpdate: now, currentStop: bus.stopName, isWaiting: true };
-                    } else {
-                        state.tracking[plate].startTime = now;
-                        state.tracking[plate].lastUpdate = now;
-                        state.tracking[plate].isWaiting = true;
-                    }
-                }
-                // 2. Up Start
-                else if (stopId === CONFIG.STOPS.UP_START) {
-                    if (!state.tracking[plate] || state.tracking[plate].type !== 'up') {
-                        state.tracking[plate] = { type: 'up', startTime: now, startStop: '捷運劍潭站', lastUpdate: now, currentStop: bus.stopName, isWaiting: true };
-                    } else {
-                        state.tracking[plate].startTime = now;
-                        state.tracking[plate].lastUpdate = now;
-                        state.tracking[plate].isWaiting = true;
-                    }
-                }
-                // 3. Moving
-                else if (state.tracking[plate]) {
+                    if (!state.tracking[plate] || state.tracking[plate].type !== 'down') state.tracking[plate] = { type: 'down', startTime: now, startStop: '文化大學', lastUpdate: now, currentStop: bus.stopName, isWaiting: true };
+                    else { state.tracking[plate].startTime = now; state.tracking[plate].lastUpdate = now; state.tracking[plate].isWaiting = true; }
+                } else if (stopId === CONFIG.STOPS.UP_START) {
+                    if (!state.tracking[plate] || state.tracking[plate].type !== 'up') state.tracking[plate] = { type: 'up', startTime: now, startStop: '捷運劍潭站', lastUpdate: now, currentStop: bus.stopName, isWaiting: true };
+                    else { state.tracking[plate].startTime = now; state.tracking[plate].lastUpdate = now; state.tracking[plate].isWaiting = true; }
+                } else if (state.tracking[plate]) {
                     const trip = state.tracking[plate];
-                    trip.isWaiting = false;
-                    trip.lastUpdate = now;
-                    trip.currentStop = bus.stopName;
-                    trip.stopId = stopId;
-
-                    if ((trip.type === 'down' && stopId === CONFIG.STOPS.DOWN_END) ||
-                        (trip.type === 'up' && stopId === CONFIG.STOPS.UP_END)) {
-                        completeTrip(plate, trip, now);
-                    }
+                    trip.isWaiting = false; trip.lastUpdate = now; trip.currentStop = bus.stopName; trip.stopId = stopId;
+                    if ((trip.type === 'down' && stopId === CONFIG.STOPS.DOWN_END) || (trip.type === 'up' && stopId === CONFIG.STOPS.UP_END)) completeTrip(plate, trip, now);
                 }
             });
-
-            // Clean stale buses
-            for (let plate in state.tracking) {
-                if (now - state.tracking[plate].lastUpdate > 1200000) delete state.tracking[plate];
-            }
+            for (let plate in state.tracking) { if (now - state.tracking[plate].lastUpdate > 1200000) delete state.tracking[plate]; }
             saveData();
         }
 
         function completeTrip(plate, trip, endTime) {
             const duration = ((endTime - trip.startTime) / 60000).toFixed(1);
             if (duration > 5 && duration < 120) {
-                state.completed.unshift({
-                    type: trip.type,
-                    plate: plate,
-                    startTime: trip.startTime,
-                    endTime: endTime,
-                    duration: duration,
-                    date: new Date().toLocaleString(),
-                });
+                state.completed.unshift({ type: trip.type, plate: plate, startTime: trip.startTime, endTime: endTime, duration: duration, date: new Date().toLocaleString() });
                 if (state.completed.length > 200) state.completed.pop();
             }
             delete state.tracking[plate];
         }
 
-        // --- Render ---
         function render() {
-            // 1. Sidebar Timeline
             const stops = state.routeStops[state.activeSidebar];
             const buses = state.allBuses.filter(b => b.direction === state.activeSidebar);
             renderTimeline(stops, buses);
-
-            // 2. Dashboard Stats
             const downs = state.completed.filter(t => t.type === 'down');
             const ups = state.completed.filter(t => t.type === 'up');
-
             const calc = list => list.length ? (list.reduce((a, b) => a + parseFloat(b.duration), 0) / list.length).toFixed(1) : '--';
             document.getElementById('down-avg').textContent = calc(downs);
             document.getElementById('up-avg').textContent = calc(ups);
@@ -522,179 +389,76 @@
             document.getElementById('up-last').textContent = ups.length ? ups[0].duration : '--';
             document.getElementById('down-count').textContent = Object.values(state.tracking).filter(t => t.type === 'down' && !t.isWaiting).length;
             document.getElementById('up-count').textContent = Object.values(state.tracking).filter(t => t.type === 'up' && !t.isWaiting).length;
-
-            // 3. Tracking Lists
-            const activeDown = Object.values(state.tracking).filter(v => v.type === 'down');
-            const activeUp = Object.values(state.tracking).filter(v => v.type === 'up');
-            renderTrackingList(document.getElementById('down-list'), activeDown, 'blue');
-            renderTrackingList(document.getElementById('up-list'), activeUp, 'orange');
-
-            // 4. History Table
+            renderTrackingList(document.getElementById('down-list'), Object.values(state.tracking).filter(v => v.type === 'down'), 'blue');
+            renderTrackingList(document.getElementById('up-list'), Object.values(state.tracking).filter(v => v.type === 'up'), 'orange');
             renderHistory();
         }
 
         function renderTimeline(stops, buses) {
             const container = document.getElementById('sidebar-container');
             if (!stops || stops.length === 0) return;
-
-            const html = stops.map(stop => {
+            container.innerHTML = stops.map(stop => {
                 const stopName = STOP_NAMES[stop.stopId] || `${stop.stopId}`;
                 const stopTTE = stop.stopTTE;
                 const sStopTTE = stopTTE.toString();
-
-                let dotClass = 'bg-white border-slate-300';
-                let statusText = '', statusClass = 'text-slate-400';
-                let rowOpacity = 'opacity-100';
-
+                let dotClass = 'bg-white border-slate-300', statusText = '', statusClass = 'text-slate-400', rowOpacity = 'opacity-100';
                 if (TTE_MAP.hasOwnProperty(sStopTTE)) {
                     statusText = TTE_MAP[sStopTTE];
-                    if (sStopTTE === '-2' || sStopTTE === '0') {
-                        statusClass = 'text-red-600 font-bold';
-                        dotClass = 'bg-red-500 border-red-500 animate-pulse ring-2 ring-red-100';
-                    } else if (sStopTTE === '-4') {
-                        statusText = '已過站';
-                        rowOpacity = 'opacity-40';
-                        dotClass = 'bg-slate-200 border-slate-200';
-                    }
+                    if (sStopTTE === '-2' || sStopTTE === '0') { statusClass = 'text-red-600 font-bold'; dotClass = 'bg-red-500 border-red-500 animate-pulse ring-2 ring-red-100'; }
+                    else if (sStopTTE === '-4') { statusText = '已過站'; rowOpacity = 'opacity-40'; dotClass = 'bg-slate-200 border-slate-200'; }
                 } else {
-                    if (stopTTE > 0 && stopTTE < 180) {
-                        statusText = '將到站';
-                        statusClass = 'text-orange-500 font-bold';
-                        dotClass = 'bg-white border-orange-500';
-                    } else if (stopTTE >= 180) {
-                        statusText = `${Math.floor(stopTTE / 60)} 分`;
-                        statusClass = 'text-blue-600 font-bold';
-                        dotClass = 'bg-white border-blue-500';
-                    }
+                    if (stopTTE > 0 && stopTTE < 180) { statusText = '將到站'; statusClass = 'text-orange-500 font-bold'; dotClass = 'bg-white border-orange-500'; }
+                    else if (stopTTE >= 180) { statusText = `${Math.floor(stopTTE / 60)} 分`; statusClass = 'text-blue-600 font-bold'; dotClass = 'bg-white border-blue-500'; }
                 }
-
-                const busHere = buses.find(b => {
-                    if (!b.a2) return false;
-                    return b.a2.split(',')[7] == stop.stopId;
-                });
-
-                let busHtml = '';
-                if (busHere) {
-                    rowOpacity = 'opacity-100';
-                    busHtml = `
-                        <div class="absolute -top-7 left-3 z-20 bus-float">
-                            <div class="bg-yellow-400 text-slate-900 text-[10px] font-bold px-2 py-0.5 rounded shadow-md border border-yellow-500 whitespace-nowrap">
-                                🚌 ${busHere.plate}
-                            </div>
-                            <div class="w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-t-[6px] border-t-yellow-500 mx-auto"></div>
-                        </div>
-                    `;
-                }
-
-                return `
-                    <div class="relative pl-10 pr-4 py-2 timeline-item ${rowOpacity} min-h-[50px] flex items-center">
-                        <div class="timeline-line"></div>
-                        <div class="absolute left-4 w-3 h-3 rounded-full border-2 ${dotClass} z-10 bg-clip-padding box-border"></div>
-                        ${busHtml}
-                        <div class="flex justify-between items-baseline w-full">
-                            <div class="text-sm font-medium text-slate-800">${stopName}</div>
-                            <div class="text-[11px] ${statusClass}">${statusText}</div>
-                        </div>
-                    </div>
-                `;
+                const busHere = buses.find(b => b.a2 && b.a2.split(',')[7] == stop.stopId);
+                const busHtml = busHere ? `<div class="absolute -top-7 left-3 z-20 bus-float"><div class="bg-yellow-400 text-slate-900 text-[10px] font-bold px-2 py-0.5 rounded shadow-md border border-yellow-500 whitespace-nowrap">🚌 ${busHere.plate}</div><div class="w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-t-[6px] border-t-yellow-500 mx-auto"></div></div>` : '';
+                if (busHere) rowOpacity = 'opacity-100';
+                return `<div class="relative pl-10 pr-4 py-2 timeline-item ${rowOpacity} min-h-[50px] flex items-center"><div class="timeline-line"></div><div class="absolute left-4 w-3 h-3 rounded-full border-2 ${dotClass} z-10 bg-clip-padding box-border"></div>${busHtml}<div class="flex justify-between items-baseline w-full"><div class="text-sm font-medium text-slate-800">${stopName}</div><div class="text-[11px] ${statusClass}">${statusText}</div></div></div>`;
             }).join('');
-            container.innerHTML = html;
         }
 
         function renderTrackingList(container, list, color) {
             container.innerHTML = list.length ? list.sort((a, b) => a.isWaiting - b.isWaiting || b.startTime - a.startTime).map(bus => {
                 const elapsed = Math.max(0, Math.floor((Date.now() - bus.startTime) / 60000));
                 const isWait = bus.isWaiting;
-                return `
-                    <div class="bg-white p-3 rounded-lg border border-${color}-100 shadow-sm flex justify-between items-center ${isWait ? 'opacity-60' : ''}">
-                        <div>
-                            <div class="font-bold text-slate-700">${bus.plate}</div>
-                            <div class="text-[10px] text-slate-500">📍 ${bus.currentStop}</div>
-                        </div>
-                        <div class="text-right">
-                            ${isWait ? '<span class="text-[10px] bg-slate-100 px-1 rounded text-slate-400">待發車</span>'
-                        : `<div class="font-mono font-black text-${color}-500 text-xl">${elapsed}<span class="text-[10px] font-normal text-slate-400">分</span></div>`}
-                        </div>
-                    </div>
-                `;
+                return `<div class="bg-white p-3 rounded-lg border border-${color}-100 shadow-sm flex justify-between items-center ${isWait ? 'opacity-60' : ''}"><div class="font-bold text-slate-700">${bus.plate}</div><div class="text-right">${isWait ? '<span class="text-[10px] bg-slate-100 px-1 rounded text-slate-400">待發車</span>' : `<div class="font-mono font-black text-${color}-500 text-xl">${elapsed}<span class="text-[10px] font-normal text-slate-400">分</span></div>`}</div></div>`;
             }).join('') : `<div class="text-center text-slate-400 text-xs py-8 opacity-50">目前無車輛</div>`;
         }
 
         function renderHistory() {
             const tbody = document.getElementById('history-table-body');
             const empty = document.getElementById('history-empty');
-            if (state.completed.length === 0) {
-                tbody.innerHTML = '';
-                empty.classList.remove('hidden');
-                return;
-            }
+            if (state.completed.length === 0) { tbody.innerHTML = ''; empty.classList.remove('hidden'); return; }
             empty.classList.add('hidden');
-            tbody.innerHTML = state.completed.map(trip => `
-                <tr>
-                    <td class="p-3">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${trip.type === 'down' ? 'bg-blue-100 text-blue-600' : 'bg-orange-100 text-orange-600'}">
-                            ${trip.type === 'down' ? '下山' : '上山'}
-                        </span>
-                    </td>
-                    <td class="p-3 font-mono font-bold text-slate-700">${trip.plate}</td>
-                    <td class="p-3 hidden md:table-cell text-slate-500">${trip.date.split(' ')[0]}</td>
-                    <td class="p-3 text-slate-500">
-                        <div class="text-[10px]">${new Date(trip.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                        <div class="text-[10px] opacity-50">↓</div>
-                        <div class="text-[10px]">${new Date(trip.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                    </td>
-                    <td class="p-3 text-right font-bold text-slate-800">${trip.duration}分</td>
-                </tr>
-            `).join('');
+            tbody.innerHTML = state.completed.map(trip => `<tr><td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${trip.type === 'down' ? 'bg-blue-100 text-blue-600' : 'bg-orange-100 text-orange-600'}">${trip.type === 'down' ? '下山' : '上山'}</span><div class="font-mono font-bold text-slate-700 mt-1">${trip.plate}</div></td><td class="p-3 text-slate-500"><div class="text-[10px]">${new Date(trip.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div><div class="text-[10px] opacity-50">↓</div><div class="text-[10px]">${new Date(trip.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div></td><td class="p-3 text-right font-bold text-slate-800">${trip.duration}分</td></tr>`).join('');
         }
 
-        // --- Utils ---
         function switchTab(tab) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(el => {
-                el.classList.remove('text-blue-600');
-                el.classList.add('text-slate-400');
-            });
+            document.querySelectorAll('.nav-btn').forEach(el => { el.classList.remove('text-blue-600'); el.classList.add('text-slate-400'); });
             document.getElementById(`view-${tab}`).classList.add('active');
-            event.currentTarget.classList.remove('text-slate-400');
-            event.currentTarget.classList.add('text-blue-600');
+            if (event) { event.currentTarget.classList.remove('text-slate-400'); event.currentTarget.classList.add('text-blue-600'); }
         }
-
         function switchSidebar(dir) {
-            state.activeSidebar = dir;
-            const isDown = dir === 'down';
+            state.activeSidebar = dir; const isDown = dir === 'down';
             document.getElementById('tab-down').className = `flex-1 py-2 text-xs font-bold rounded-md transition-all shadow-sm ${isDown ? 'bg-white text-blue-600' : 'text-slate-500 hover:text-slate-700'}`;
             document.getElementById('tab-up').className = `flex-1 py-2 text-xs font-bold rounded-md transition-all shadow-sm ${!isDown ? 'bg-white text-orange-600' : 'text-slate-500 hover:text-slate-700'}`;
             renderTimeline(state.routeStops[dir], state.allBuses.filter(b => b.direction === dir));
         }
-
         function updateStatus(s) {
-            const el = document.getElementById('last-update-time');
-            if (el) el.textContent = s === 'loading' ? '更新中...' : `更新於 ${new Date().toLocaleTimeString()}`;
-            const mob = document.getElementById('mobile-status-text');
-            if (mob) mob.textContent = s === 'loading' ? '更新中...' : new Date().toLocaleTimeString();
+            const el = document.getElementById('last-update-time'); if (el) el.textContent = s === 'loading' ? '更新中...' : `更新於 ${new Date().toLocaleTimeString()}`;
+            const mob = document.getElementById('mobile-status-text'); if (mob) mob.textContent = s === 'loading' ? '更新中...' : new Date().toLocaleTimeString();
         }
-
         function saveData() { localStorage.setItem('red5_final_v2', JSON.stringify({ tracking: state.tracking, completed: state.completed })); }
-        function loadData() {
-            const raw = localStorage.getItem('red5_final_v2');
-            if (raw) { const d = JSON.parse(raw); state.tracking = d.tracking || {}; state.completed = d.completed || []; }
-        }
+        function loadData() { const raw = localStorage.getItem('red5_final_v2'); if (raw) { const d = JSON.parse(raw); state.tracking = d.tracking || {}; state.completed = d.completed || []; } }
         function exportCSV() {
             if (state.completed.length === 0) return alert('無資料');
             let csv = "方向,車號,日期,開始,結束,耗時(分)\n";
-            state.completed.forEach(t => {
-                csv += `${t.type === 'down' ? '下山' : '上山'},${t.plate},${t.date},${new Date(t.startTime).toLocaleTimeString()},${new Date(t.endTime).toLocaleTimeString()},${t.duration}\n`;
-            });
+            state.completed.forEach(t => { csv += `${t.type === 'down' ? '下山' : '上山'},${t.plate},${t.date},${new Date(t.startTime).toLocaleTimeString()},${new Date(t.endTime).toLocaleTimeString()},${t.duration}\n`; });
             const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a"); link.href = URL.createObjectURL(blob);
-            link.download = `Red5_History_${new Date().toISOString().slice(0, 10)}.csv`; link.click();
+            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Red5_History_${new Date().toISOString().slice(0, 10)}.csv`; link.click();
         }
-
-        window.switchTab = switchTab;
-        window.switchSidebar = switchSidebar;
-        window.exportCSV = exportCSV;
-        init();
+        window.switchTab = switchTab; window.switchSidebar = switchSidebar; window.exportCSV = exportCSV; init();
     </script>
 </body>
 
