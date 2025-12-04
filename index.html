@@ -109,7 +109,7 @@
                 </div>
             </div>
 
-            <!-- 修正：手機版增加底部間距 (pb-24) 防止被導航列遮擋 -->
+            <!-- Sidebar List with Mobile Padding Fix (pb-24) -->
             <div class="flex-1 overflow-y-auto p-0 pb-24 md:pb-0 relative scroll-hide bg-white" id="sidebar-container">
                 <div class="p-10 text-center text-slate-400 text-xs">載入路線資料中...</div>
             </div>
@@ -252,7 +252,6 @@
         </button>
     </nav>
 
-    <!-- Logic -->
     <script>
         const CONFIG = {
             API_URLS: [
@@ -287,7 +286,6 @@
             fetchData();
             setInterval(fetchData, CONFIG.REFRESH_MS);
             if (window.innerWidth >= 768) {
-                // Desktop: Show all 3 columns
                 document.getElementById('view-route').classList.add('active');
                 document.getElementById('view-home').classList.add('active');
                 document.getElementById('view-history').classList.add('active');
@@ -352,10 +350,10 @@
                 const plate = bus.plate;
                 const stopId = bus.stopId;
                 if (stopId === CONFIG.STOPS.DOWN_START) {
-                    if (!state.tracking[plate] || state.tracking[plate].type !== 'down') state.tracking[plate] = { type: 'down', startTime: now, startStop: '文化大學', lastUpdate: now, currentStop: bus.stopName, isWaiting: true };
+                    if (!state.tracking[plate] || state.tracking[plate].type !== 'down') state.tracking[plate] = { plate: plate, type: 'down', startTime: now, startStop: '文化大學', lastUpdate: now, currentStop: bus.stopName, isWaiting: true };
                     else { state.tracking[plate].startTime = now; state.tracking[plate].lastUpdate = now; state.tracking[plate].isWaiting = true; }
                 } else if (stopId === CONFIG.STOPS.UP_START) {
-                    if (!state.tracking[plate] || state.tracking[plate].type !== 'up') state.tracking[plate] = { type: 'up', startTime: now, startStop: '捷運劍潭站', lastUpdate: now, currentStop: bus.stopName, isWaiting: true };
+                    if (!state.tracking[plate] || state.tracking[plate].type !== 'up') state.tracking[plate] = { plate: plate, type: 'up', startTime: now, startStop: '捷運劍潭站', lastUpdate: now, currentStop: bus.stopName, isWaiting: true };
                     else { state.tracking[plate].startTime = now; state.tracking[plate].lastUpdate = now; state.tracking[plate].isWaiting = true; }
                 } else if (state.tracking[plate]) {
                     const trip = state.tracking[plate];
@@ -421,7 +419,7 @@
             container.innerHTML = list.length ? list.sort((a, b) => a.isWaiting - b.isWaiting || b.startTime - a.startTime).map(bus => {
                 const elapsed = Math.max(0, Math.floor((Date.now() - bus.startTime) / 60000));
                 const isWait = bus.isWaiting;
-                return `<div class="bg-white p-3 rounded-lg border border-${color}-100 shadow-sm flex justify-between items-center ${isWait ? 'opacity-60' : ''}"><div class="font-bold text-slate-700">${bus.plate}</div><div class="text-right">${isWait ? '<span class="text-[10px] bg-slate-100 px-1 rounded text-slate-400">待發車</span>' : `<div class="font-mono font-black text-${color}-500 text-xl">${elapsed}<span class="text-[10px] font-normal text-slate-400">分</span></div>`}</div></div>`;
+                return `<div class="bg-white p-3 rounded-lg border border-${color}-100 shadow-sm flex justify-between items-center ${isWait ? 'opacity-60' : ''}"><div class="font-bold text-slate-700">${bus.plate}</div><div class="text-[10px] text-slate-500">📍 ${bus.currentStop}</div><div class="text-right">${isWait ? '<span class="text-[10px] bg-slate-100 px-1 rounded text-slate-400">待發車</span>' : `<div class="font-mono font-black text-${color}-500 text-xl">${elapsed}<span class="text-[10px] font-normal text-slate-400">分</span></div>`}</div></div>`;
             }).join('') : `<div class="text-center text-slate-400 text-xs py-8 opacity-50">目前無車輛</div>`;
         }
 
