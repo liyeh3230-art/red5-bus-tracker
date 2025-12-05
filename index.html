@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>紅5 雙向即時監測 - 文化大學 ⇄ 捷運劍潭站</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Noto+Sans+TC:wght@400;500;700&display=swap"
         rel="stylesheet">
@@ -109,6 +109,7 @@
                 </div>
             </div>
 
+            <!-- Sidebar List with Mobile Padding Fix (pb-24) -->
             <div class="flex-1 overflow-y-auto p-0 pb-24 md:pb-0 relative scroll-hide bg-white" id="sidebar-container">
                 <div class="p-10 text-center text-slate-400 text-xs">載入路線資料中...</div>
             </div>
@@ -125,8 +126,10 @@
         <main id="view-home"
             class="tab-content active md:flex flex-1 flex-col h-full relative bg-slate-50 w-full absolute md:relative inset-0 overflow-y-auto md:overflow-hidden">
 
+            <!-- Stats Cards -->
             <header class="bg-white border-b border-slate-200 p-4 shadow-sm z-10 shrink-0">
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                    <!-- Downhill Card -->
                     <div
                         class="bg-gradient-to-br from-blue-50 to-white border border-blue-100 rounded-xl p-4 relative overflow-hidden shadow-sm group">
                         <div
@@ -150,6 +153,7 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Uphill Card -->
                     <div
                         class="bg-gradient-to-br from-orange-50 to-white border border-orange-100 rounded-xl p-4 relative overflow-hidden shadow-sm group">
                         <div
@@ -176,13 +180,16 @@
                 </div>
             </header>
 
+            <!-- Lists Split View -->
             <div class="flex-1 flex flex-col xl:flex-row overflow-hidden bg-slate-50 pb-20 md:pb-0">
+                <!-- Down List -->
                 <section class="flex-1 flex flex-col relative border-b xl:border-b-0 xl:border-r border-slate-200">
                     <div
                         class="px-4 py-2 bg-slate-100/80 backdrop-blur border-b border-slate-200 text-xs font-bold text-slate-500 sticky top-0 z-10">
                         📉 下山監測 (行駛中)</div>
                     <div class="flex-1 overflow-y-auto p-4 space-y-3 scroll-hide" id="down-list"></div>
                 </section>
+                <!-- Up List -->
                 <section class="flex-1 flex flex-col relative">
                     <div
                         class="px-4 py-2 bg-slate-100/80 backdrop-blur border-b border-slate-200 text-xs font-bold text-slate-500 sticky top-0 z-10">
@@ -213,6 +220,7 @@
                         </tr>
                     </thead>
                     <tbody id="history-table-body" class="divide-y divide-slate-100 bg-white">
+                        <!-- Dynamic -->
                     </tbody>
                 </table>
                 <div id="history-empty" class="p-10 text-center text-slate-400 text-xs hidden">尚無紀錄</div>
@@ -244,7 +252,6 @@
         </button>
     </nav>
 
-    <!-- ✅ JavaScript moved to end of body -->
     <script>
         const CONFIG = {
             API_URLS: [
@@ -253,7 +260,7 @@
                 'https://pda5284.gov.taipei/MQS/SubRouteDyna?csvsubrouteid=158419',
                 'https://pda5284.gov.taipei/MQS/SubRouteDyna?csvsubrouteid=157610'
             ],
-            PROXIES: ['https://corsproxy.io/?'],
+            PROXIES: ['https://corsproxy.io/?', 'https://api.allorigins.win/raw?url=', 'https://cors-anywhere.herokuapp.com/'],
             REFRESH_MS: 3000,
             STOPS: { DOWN_START: '11073', DOWN_END: '11121', UP_START: '11123', UP_END: '11169' }
         };
@@ -273,17 +280,6 @@
         };
 
         let state = { tracking: {}, completed: [], proxyIndex: 0, allBuses: [], routeStops: { down: [], up: [] }, activeSidebar: 'down' };
-        let renderScheduled = false;
-
-        function scheduleRender() {
-            if (!renderScheduled) {
-                renderScheduled = true;
-                requestAnimationFrame(() => {
-                    render();
-                    renderScheduled = false;
-                });
-            }
-        }
 
         function init() {
             loadData();
@@ -300,22 +296,18 @@
 
         async function fetchData() {
             updateStatus('loading');
-            const proxy = CONFIG.PROXIES[0];
+            const proxy = CONFIG.PROXIES[state.proxyIndex];
             const busMap = new Map();
             let fetchedStops = { down: null, up: null };
             try {
-                const promises = CONFIG.API_URLS.map(url =>
-                    fetch(proxy + encodeURIComponent(url.trim()))
-                        .then(r => r.ok ? r.json() : null)
-                        .catch(e => null)
-                );
+                const promises = CONFIG.API_URLS.map(url => fetch(proxy + encodeURIComponent(url)).then(r => r.ok ? r.json() : null).catch(e => null));
                 const results = await Promise.all(promises);
                 results.forEach((data, index) => {
                     if (data) {
                         if (data.contents) try { data = JSON.parse(data.contents); } catch (e) { }
                         if (!data.SubRoute) return;
                         const dir = index < 2 ? 'down' : 'up';
-                        if (!fessedStops[dir] && data.SubRoute[0]?.TTE?.stops) fetchedStops[dir] = data.SubRoute[0].TTE.stops;
+                        if (!fetchedStops[dir] && data.SubRoute[0]?.TTE?.stops) fetchedStops[dir] = data.SubRoute[0].TTE.stops;
                         parseBusData(data, busMap, dir);
                     }
                 });
@@ -324,15 +316,16 @@
                 state.allBuses = Array.from(busMap.values());
                 updateTracking(state.allBuses);
                 updateStatus('ok');
-                scheduleRender();
+                render();
             } catch (e) {
+                state.proxyIndex = (state.proxyIndex + 1) % CONFIG.PROXIES.length;
                 updateStatus('error');
             }
         }
 
         function parseBusData(data, busMap, direction) {
             const okDataMS = Date.now() - 1200000;
-            data.SubRoute?.forEach(sub => {
+            data.SubRoute.forEach(sub => {
                 if (!sub.Bus) return;
                 sub.Bus.forEach(bus => {
                     if (!bus.a2 || /^TEST.*$/g.test(bus.num)) return;
@@ -357,10 +350,10 @@
                 const plate = bus.plate;
                 const stopId = bus.stopId;
                 if (stopId === CONFIG.STOPS.DOWN_START) {
-                    if (!state.tracking[plate] || state.tracking[plate].type !== 'down') state.tracking[plate] = { plate, type: 'down', startTime: now, startStop: '文化大學', lastUpdate: now, currentStop: bus.stopName, isWaiting: true };
+                    if (!state.tracking[plate] || state.tracking[plate].type !== 'down') state.tracking[plate] = { plate: plate, type: 'down', startTime: now, startStop: '文化大學', lastUpdate: now, currentStop: bus.stopName, isWaiting: true };
                     else { state.tracking[plate].startTime = now; state.tracking[plate].lastUpdate = now; state.tracking[plate].isWaiting = true; }
                 } else if (stopId === CONFIG.STOPS.UP_START) {
-                    if (!state.tracking[plate] || state.tracking[plate].type !== 'up') state.tracking[plate] = { plate, type: 'up', startTime: now, startStop: '捷運劍潭站', lastUpdate: now, currentStop: bus.stopName, isWaiting: true };
+                    if (!state.tracking[plate] || state.tracking[plate].type !== 'up') state.tracking[plate] = { plate: plate, type: 'up', startTime: now, startStop: '捷運劍潭站', lastUpdate: now, currentStop: bus.stopName, isWaiting: true };
                     else { state.tracking[plate].startTime = now; state.tracking[plate].lastUpdate = now; state.tracking[plate].isWaiting = true; }
                 } else if (state.tracking[plate]) {
                     const trip = state.tracking[plate];
@@ -368,68 +361,40 @@
                     if ((trip.type === 'down' && stopId === CONFIG.STOPS.DOWN_END) || (trip.type === 'up' && stopId === CONFIG.STOPS.UP_END)) completeTrip(plate, trip, now);
                 }
             });
-            for (let plate in state.tracking) {
-                if (now - state.tracking[plate].lastUpdate > 1200000) delete state.tracking[plate];
-            }
+            for (let plate in state.tracking) { if (now - state.tracking[plate].lastUpdate > 1200000) delete state.tracking[plate]; }
             saveData();
         }
 
         function completeTrip(plate, trip, endTime) {
             const duration = ((endTime - trip.startTime) / 60000).toFixed(1);
             if (duration > 5 && duration < 120) {
-                state.completed.unshift({ type: trip.type, plate, startTime: trip.startTime, endTime, duration, date: new Date().toLocaleString() });
+                state.completed.unshift({ type: trip.type, plate: plate, startTime: trip.startTime, endTime: endTime, duration: duration, date: new Date().toLocaleString() });
                 if (state.completed.length > 200) state.completed.pop();
             }
             delete state.tracking[plate];
         }
 
-        let lastDownCount = -1, lastUpCount = -1, lastCompletedLen = -1;
         function render() {
             const stops = state.routeStops[state.activeSidebar];
             const buses = state.allBuses.filter(b => b.direction === state.activeSidebar);
             renderTimeline(stops, buses);
-
             const downs = state.completed.filter(t => t.type === 'down');
             const ups = state.completed.filter(t => t.type === 'up');
             const calc = list => list.length ? (list.reduce((a, b) => a + parseFloat(b.duration), 0) / list.length).toFixed(1) : '--';
-
-            const downAvg = calc(downs);
-            const upAvg = calc(ups);
-            const downLast = downs.length ? downs[0].duration : '--';
-            const upLast = ups.length ? ups[0].duration : '--';
-            const downCount = Object.values(state.tracking).filter(t => t.type === 'down' && !t.isWaiting).length;
-            const upCount = Object.values(state.tracking).filter(t => t.type === 'up' && !t.isWaiting).length;
-
-            if (downAvg !== document.getElementById('down-avg').textContent) document.getElementById('down-avg').textContent = downAvg;
-            if (upAvg !== document.getElementById('up-avg').textContent) document.getElementById('up-avg').textContent = upAvg;
-            if (downLast !== document.getElementById('down-last').textContent) document.getElementById('down-last').textContent = downLast;
-            if (upLast !== document.getElementById('up-last').textContent) document.getElementById('up-last').textContent = upLast;
-            if (downCount !== parseInt(document.getElementById('down-count').textContent)) document.getElementById('down-count').textContent = downCount;
-            if (upCount !== parseInt(document.getElementById('up-count').textContent)) document.getElementById('up-count').textContent = upCount;
-
-            const currentDownTrack = Object.values(state.tracking).filter(v => v.type === 'down');
-            const currentUpTrack = Object.values(state.tracking).filter(v => v.type === 'up');
-            const currentCompletedLen = state.completed.length;
-
-            if (currentDownTrack.length !== lastDownCount || currentCompletedLen !== lastCompletedLen) {
-                renderTrackingList(document.getElementById('down-list'), currentDownTrack, 'blue');
-            }
-            if (currentUpTrack.length !== lastUpCount || currentCompletedLen !== lastCompletedLen) {
-                renderTrackingList(document.getElementById('up-list'), currentUpTrack, 'orange');
-            }
+            document.getElementById('down-avg').textContent = calc(downs);
+            document.getElementById('up-avg').textContent = calc(ups);
+            document.getElementById('down-last').textContent = downs.length ? downs[0].duration : '--';
+            document.getElementById('up-last').textContent = ups.length ? ups[0].duration : '--';
+            document.getElementById('down-count').textContent = Object.values(state.tracking).filter(t => t.type === 'down' && !t.isWaiting).length;
+            document.getElementById('up-count').textContent = Object.values(state.tracking).filter(t => t.type === 'up' && !t.isWaiting).length;
+            renderTrackingList(document.getElementById('down-list'), Object.values(state.tracking).filter(v => v.type === 'down'), 'blue');
+            renderTrackingList(document.getElementById('up-list'), Object.values(state.tracking).filter(v => v.type === 'up'), 'orange');
             renderHistory();
-
-            lastDownCount = currentDownTrack.length;
-            lastUpCount = currentUpTrack.length;
-            lastCompletedLen = currentCompletedLen;
         }
 
         function renderTimeline(stops, buses) {
             const container = document.getElementById('sidebar-container');
-            if (!stops || stops.length === 0) {
-                container.innerHTML = '<div class="p-10 text-center text-slate-400 text-xs">載入路線資料中...</div>';
-                return;
-            }
+            if (!stops || stops.length === 0) return;
             container.innerHTML = stops.map(stop => {
                 const stopName = STOP_NAMES[stop.stopId] || `${stop.stopId}`;
                 const stopTTE = stop.stopTTE;
@@ -468,73 +433,30 @@
 
         function switchTab(tab) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(el => el.classList.add('text-slate-400'));
-            const target = document.getElementById(`view-${tab}`);
-            if (target) target.classList.add('active');
-            if (event) {
-                event.currentTarget.classList.remove('text-slate-400');
-                event.currentTarget.classList.add('text-blue-600');
-            }
+            document.querySelectorAll('.nav-btn').forEach(el => { el.classList.remove('text-blue-600'); el.classList.add('text-slate-400'); });
+            document.getElementById(`view-${tab}`).classList.add('active');
+            if (event) { event.currentTarget.classList.remove('text-slate-400'); event.currentTarget.classList.add('text-blue-600'); }
         }
-
         function switchSidebar(dir) {
-            state.activeSidebar = dir;
-            const isDown = dir === 'down';
+            state.activeSidebar = dir; const isDown = dir === 'down';
             document.getElementById('tab-down').className = `flex-1 py-2 text-xs font-bold rounded-md transition-all shadow-sm ${isDown ? 'bg-white text-blue-600' : 'text-slate-500 hover:text-slate-700'}`;
             document.getElementById('tab-up').className = `flex-1 py-2 text-xs font-bold rounded-md transition-all shadow-sm ${!isDown ? 'bg-white text-orange-600' : 'text-slate-500 hover:text-slate-700'}`;
             renderTimeline(state.routeStops[dir], state.allBuses.filter(b => b.direction === dir));
         }
-
         function updateStatus(s) {
-            const el = document.getElementById('last-update-time');
-            const mob = document.getElementById('mobile-status-text');
-            const timeStr = new Date().toLocaleTimeString();
-            if (el) el.textContent = s === 'loading' ? '更新中...' : `更新於 ${timeStr}`;
-            if (mob) mob.textContent = s === 'loading' ? '更新中...' : timeStr;
+            const el = document.getElementById('last-update-time'); if (el) el.textContent = s === 'loading' ? '更新中...' : `更新於 ${new Date().toLocaleTimeString()}`;
+            const mob = document.getElementById('mobile-status-text'); if (mob) mob.textContent = s === 'loading' ? '更新中...' : new Date().toLocaleTimeString();
         }
-
-        function saveData() {
-            setTimeout(() => {
-                try {
-                    localStorage.setItem('red5_final_v2', JSON.stringify({ tracking: state.tracking, completed: state.completed }));
-                } catch (e) {
-                    console.warn('Failed to save data:', e);
-                }
-            }, 0);
-        }
-
-        function loadData() {
-            try {
-                const raw = localStorage.getItem('red5_final_v2');
-                if (raw) {
-                    const d = JSON.parse(raw);
-                    state.tracking = d.tracking || {};
-                    state.completed = d.completed || [];
-                }
-            } catch (e) {
-                console.warn('Failed to load data:', e);
-            }
-        }
-
+        function saveData() { localStorage.setItem('red5_final_v2', JSON.stringify({ tracking: state.tracking, completed: state.completed })); }
+        function loadData() { const raw = localStorage.getItem('red5_final_v2'); if (raw) { const d = JSON.parse(raw); state.tracking = d.tracking || {}; state.completed = d.completed || []; } }
         function exportCSV() {
             if (state.completed.length === 0) return alert('無資料');
             let csv = "方向,車號,日期,開始,結束,耗時(分)\n";
-            state.completed.forEach(t => {
-                csv += `${t.type === 'down' ? '下山' : '上山'},${t.plate},${t.date},${new Date(t.startTime).toLocaleTimeString()},${new Date(t.endTime).toLocaleTimeString()},${t.duration}\n`;
-            });
+            state.completed.forEach(t => { csv += `${t.type === 'down' ? '下山' : '上山'},${t.plate},${t.date},${new Date(t.startTime).toLocaleTimeString()},${new Date(t.endTime).toLocaleTimeString()},${t.duration}\n`; });
             const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = `Red5_History_${new Date().toISOString().slice(0, 10)}.csv`;
-            link.click();
+            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Red5_History_${new Date().toISOString().slice(0, 10)}.csv`; link.click();
         }
-
-        window.switchTab = switchTab;
-        window.switchSidebar = switchSidebar;
-        window.exportCSV = exportCSV;
-
-        // ✅ DOM 已載入，安全執行
-        init();
+        window.switchTab = switchTab; window.switchSidebar = switchSidebar; window.exportCSV = exportCSV; init();
     </script>
 </body>
 
