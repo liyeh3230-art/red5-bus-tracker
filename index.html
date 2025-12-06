@@ -260,10 +260,24 @@
                 'https://pda5284.gov.taipei/MQS/SubRouteDyna?csvsubrouteid=158419',
                 'https://pda5284.gov.taipei/MQS/SubRouteDyna?csvsubrouteid=157610'
             ],
-            PROXIES: ['https://corsproxy.io/?', 'https://api.allorigins.win/raw?url=', 'https://cors-anywhere.herokuapp.com/'],
-            REFRESH_MS: 3000,
+            // Prioritize allorigins for file:// compatibility, corsproxy as backup
+            PROXIES: [
+                'https://api.allorigins.win/raw?url=',
+                'https://corsproxy.io/?',
+                'https://cors-anywhere.herokuapp.com/'
+            ],
+            REFRESH_MS: 3000, // Reverted to 3000ms as requested
             STOPS: { DOWN_START: '11073', DOWN_END: '11121', UP_START: '11123', UP_END: '11169' }
         };
+
+        // Check for file:// protocol
+        if (window.location.protocol === 'file:') {
+            const warning = document.createElement('div');
+            warning.className = 'fixed top-0 left-0 w-full bg-red-600 text-white text-xs font-bold p-2 z-[9999] text-center';
+            warning.innerHTML = '⚠️ 注意：目前正以檔案模式執行 (file://)。公車資料可能因瀏覽器安全限制無法載入。請使用 Local Server (如 VS Code Live Server) 瀏覽以獲得最佳體驗。';
+            document.body.prepend(warning);
+            // In file mode, some proxies might fail harder.
+        }
 
         const TTE_MAP = { '0': '進站中', '': '未發車', '-1': '未發車', '-2': '交管不停', '-3': '末班已過', '-4': '今日未營運' };
         const FIRST_STOP_MAP = { "158420": "174781", "157609": "174781", "158419": "134539", "157610": "134539" };
@@ -447,8 +461,23 @@
             const el = document.getElementById('last-update-time'); if (el) el.textContent = s === 'loading' ? '更新中...' : `更新於 ${new Date().toLocaleTimeString()}`;
             const mob = document.getElementById('mobile-status-text'); if (mob) mob.textContent = s === 'loading' ? '更新中...' : new Date().toLocaleTimeString();
         }
-        function saveData() { localStorage.setItem('red5_final_v2', JSON.stringify({ tracking: state.tracking, completed: state.completed })); }
-        function loadData() { const raw = localStorage.getItem('red5_final_v2'); if (raw) { const d = JSON.parse(raw); state.tracking = d.tracking || {}; state.completed = d.completed || []; } }
+        function saveData() {
+            localStorage.setItem('red5_final_v2', JSON.stringify({ tracking: state.tracking, completed: state.completed }));
+        }
+        function loadData() {
+            const raw = localStorage.getItem('red5_final_v2');
+            if (raw) {
+                try {
+                    const d = JSON.parse(raw);
+                    state.tracking = d.tracking || {};
+                    // Enforce limit on load to fix any legacy huge data
+                    state.completed = (d.completed || []).slice(0, 200);
+                } catch (e) {
+                    console.error("Load failed", e);
+                    state.completed = [];
+                }
+            }
+        }
         function exportCSV() {
             if (state.completed.length === 0) return alert('無資料');
             let csv = "方向,車號,日期,開始,結束,耗時(分)\n";
